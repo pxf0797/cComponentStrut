@@ -6,6 +6,35 @@
  */
 
 #include "casSch.h"
+#include "..\..\04_abi\abi.h"
+#include "..\..\11_vfbM\casSch\vfbMcasSch.h"
+
+// --------------------------------------------------------------
+// 组件初始化
+// --------------------------------------------------------------
+// 组件初始化------------------------
+int16 casSchInit(void)
+{
+    int16 rtv = 0;
+
+    CN(casSch, &casSchA, &time, &vfbOcasSchA);
+    if (OPRS(casSchA) != OOPC_NULL)
+    {
+        rtv = vfbOcasSchInit();
+    }
+    else
+    {
+        rtv = -1;
+    }
+
+    return rtv;
+}
+
+// --------------------------------------------------------------
+// 组件调度
+// --------------------------------------------------------------
+// 组件进行调度--------------------------
+
 
 // --------------------------------------------------------------
 // 通用功能函数
@@ -50,7 +79,7 @@ void schSm_act_init(void *hStaRec)
 {
     hschSmRec rec = (hschSmRec)hStaRec;
 
-    rec->casSch = &casSchA;
+    rec->casSch = (void *)&casSchA;
 
     rec->next = schSm_sta_update;
 }

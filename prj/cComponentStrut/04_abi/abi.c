@@ -9,22 +9,18 @@
 #include "..\06_cas\casSch\casSch.h"
 #include "..\03_bsp\bsp.h"
 
-// 线程类抽象接口
-isr timer;
-isr mainLoop;
+// --------------------------------------------------------------
+// 组组件输入初始化
+// --------------------------------------------------------------
+int16 vfbIabiInit(void)
+{
+    return abiInit();
+}
 
-// 时间测量类抽象接口
-measure time;
-
-// 输入类抽象接口
-gi err;
-
-// 输出类抽象接口
-go led;
-
-
-
-void abiInit(void)
+// --------------------------------------------------------------
+// 组件初始化
+// --------------------------------------------------------------
+int16 abiInit(void)
 {
     int16 abiInitErr = 0;
 
@@ -57,6 +53,25 @@ void abiInit(void)
         abiInitErr++;
     }
 
+    return 0;
 }
+
+
+// 线程类抽象接口
+isr timer;
+isr mainLoop;
+
+// 时间测量类抽象接口
+measure time;
+
+// 输入类抽象接口
+gi err;
+
+// 输出类抽象接口
+go led;
+
+
+
+
 
 

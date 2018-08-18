@@ -1,32 +1,24 @@
 /*
- * vfbMcasSch.c
+ * vfbMcpcFdam.c
  *
  *  Created on: 2018年8月18日
  *      Author: pxf
  */
 
-#include "vfbMcasSch.h"
-#include "..\..\09_cpc\cpcFdam\cpcFdam.h"
-
+#include "vfbMcpcFdam.h"
 
 // --------------------------------------------------------------
 // 管理组件初始化
 // --------------------------------------------------------------
-int16 vfbMcasSchInit(void)
+// 管理组件初始化------------------------
+int16 vfbMcpcFdamInit(void)
 {
     int16 rtv = 0;
-    int16 id = 0;
 
-    CNNP(vfbMcasSch, &vfbMcasSchA);
-    if (OPRS(vfbMcasSchA) != OOPC_NULL)
+    CNNP(vfbMcpcFdam, &vfbMcpcFdamA);
+    if (OPRS(vfbMcpcFdamA) != OOPC_NULL)
     {
-        rtv = vfbIcpcFdamInit();
-        if (rtv == 0)
-        {
-            vfbIcasSchA.addTask(vfbIcasSchA.self, id, cpcFdamSch, 10000, 11);
-            id++;
-        }
-
+        rtv = 0;
     }
     else
     {
@@ -37,28 +29,22 @@ int16 vfbMcasSchInit(void)
 }
 
 
+
 // --------------------------------------------------------------
 // 组件管理类定义
 // --------------------------------------------------------------
-hvfbMcasSch hvfbMcasSch_init(hvfbMcasSch cthis)
+hvfbMcpcFdam vfbMcpcFdam_init(hvfbMcpcFdam cthis)
 {
     return cthis;
 }
 
-void hvfbMcasSch_tickOut(hvfbMcasSch t)
-{}
-void hvfbMcasSch_err(hvfbMcasSch t, herrCode code)
-{}
-
-CC(vfbMcasSch)
+CC(vfbMcpcFdam)
 {
-    cthis->init = hvfbMcasSch_init;
-    cthis->tickOut = hvfbMcasSch_tickOut;
-    cthis->err = hvfbMcasSch_err;
+    cthis->init = vfbMcpcFdam_init;
 
     return cthis;
 }
-CD(vfbMcasSch)
+CD(vfbMcpcFdam)
 {
     return OOPC_TRUE;
 }
@@ -66,12 +52,11 @@ CD(vfbMcasSch)
 // --------------------------------------------------------------
 // 输出类接口定义
 // --------------------------------------------------------------
-void vfbMcasSch_vfbOcasSch_tickOut(hvfbOcasSch t)
-{}
-void vfbMcasSch_vfbOcasSch_err(hvfbOcasSch t, herrCode code)
-{}
+
+
+
 
 // --------------------------------------------------------------
 // 组件管理类实例
 // --------------------------------------------------------------
-vfbMcasSch vfbMcasSchA;
+vfbMcpcFdam vfbMcpcFdamA;

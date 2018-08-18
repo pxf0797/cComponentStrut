@@ -13,6 +13,27 @@
 #include "casSchErrCode.h"
 
 // --------------------------------------------------------------
+// 组件初始化
+// --------------------------------------------------------------
+// 组件输入初始化------------------------
+int16 vfbIcasSchInit(void);
+
+// 组件初始化----------------------------
+int16 casSchInit(void);
+
+// 组件输出初始化------------------------
+int16 vfbOcasSchInit(void);
+
+// 管理组件初始化外部声明----------------
+extern int16 vfbMcasSchInit(void);
+
+// --------------------------------------------------------------
+// 组件调度
+// --------------------------------------------------------------
+// 组件进行调度--------------------------
+
+
+// --------------------------------------------------------------
 // 抽象输入类通用数据类型
 // --------------------------------------------------------------
 
@@ -37,8 +58,8 @@ CL(vfbOcasSch)
 };
 
 // 外部接口声明--------------------------
-void vfbMcasSch_vfbOcasSch_tickOut(hvfbOcasSch t);                 // 接口结构：存放类+功能类+功能类函数
-void vfbMcasSch_vfbOcasSch_err(hvfbOcasSch t, herrCode code);
+extern void vfbMcasSch_vfbOcasSch_tickOut(hvfbOcasSch t);
+extern void vfbMcasSch_vfbOcasSch_err(hvfbOcasSch t, herrCode code);
 
 // 抽象输出类实例------------------------
 extern vfbOcasSch vfbOcasSchA;

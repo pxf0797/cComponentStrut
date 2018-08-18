@@ -8,6 +8,28 @@
 #include "casSch.h"
 
 // --------------------------------------------------------------
+// 组件输出初始化
+// --------------------------------------------------------------
+// 组件输出初始化------------------------
+int16 vfbOcasSchInit(void)
+{
+    int16 rtv = 0;
+
+    CN(vfbOcasSch, &vfbOcasSchA, vfbMcasSch_vfbOcasSch_tickOut, vfbMcasSch_vfbOcasSch_err);
+    if (OPRS(vfbOcasSchA) != OOPC_NULL)
+    {
+        rtv = vfbMcasSchInit();
+    }
+    else
+    {
+        rtv = -1;
+    }
+
+    return rtv;
+}
+
+
+// --------------------------------------------------------------
 // 抽象输出类定义
 // --------------------------------------------------------------
 hvfbOcasSch vfbOcasSch_init(hvfbOcasSch cthis,

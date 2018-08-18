@@ -7,9 +7,19 @@
 
 #include "bsp.h"
 #include "..\04_abi\abi.h"
+#include "..\05_cpnInit\cpnInit.h"
 
-void bspInit(void)
-{}
+// --------------------------------------------------------------
+// bsp接口初始化
+// --------------------------------------------------------------
+int16 bspInit(void)
+{
+    return cpnInit();
+}
+
+
+
+
 void bspTimer_bsp(void)
 {
     timer.iIsr.isr();

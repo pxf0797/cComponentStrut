@@ -11,18 +11,23 @@
 #include "..\..\06_cas\casSch\casSch.h"
 
 // --------------------------------------------------------------
+// 管理组件初始化
+// --------------------------------------------------------------
+// 管理组件初始化------------------------
+int16 vfbMcasSchInit(void);
+
+
+// --------------------------------------------------------------
 // 组件管理类定义
 // --------------------------------------------------------------
 // 组件管理类声明------------------------
 CL(vfbMcasSch)
 {
     hvfbMcasSch self;
-    hvfbMcasSch (*init)(hvfbMcasSch cthis, hcasSch casSch);
+    hvfbMcasSch (*init)(hvfbMcasSch cthis);
 
     void (*tickOut)(hvfbMcasSch t);
     void (*err)(hvfbMcasSch t, herrCode code);
-
-    INJ(casSch, casSch);
 };
 
 // 输出类接口声明------------------------
