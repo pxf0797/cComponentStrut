@@ -28,12 +28,12 @@ void abiInit(void)
 {
     int16 abiInitErr = 0;
 
-    CN(isr, &timer, casSch_timer_bsp);
+    CN(isr, &timer, abi_casSch_timer);
     if (OPRS(timer) == OOPC_NULL)
     {
         abiInitErr++;
     }
-    CN(isr, &mainLoop, casSch_mainLoop_bsp);
+    CN(isr, &mainLoop, abi_casSch_mainLoop);
     if (OPRS(mainLoop) == OOPC_NULL)
     {
         abiInitErr++;

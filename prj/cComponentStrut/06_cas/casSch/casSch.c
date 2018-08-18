@@ -7,76 +7,293 @@
 
 #include "casSch.h"
 
+// --------------------------------------------------------------
+// 通用功能函数
+// --------------------------------------------------------------
+// 默认任务
+static void schTaskDefault(void)
+{}
 
+// 纯粹求2^n的对应的对数n
+static inline int16 log_2n(uint32 num)
+{
+    int16 n = 0;
+    if ((num & 0xFFFF0000U) != 0U)
+    {
+        n += 16;
+    }
+    if ((num & 0xFF00FF00U) != 0U)
+    {
+        n += 8;
+    }
+    if ((num & 0xF0F0F0F0U) != 0U)
+    {
+        n += 4;
+    }
+    if ((num & 0xCCCCCCCCU) != 0U)
+    {
+        n += 2;
+    }
+    if ((num & 0xAAAAAAAAU) != 0U)
+    {
+        n += 1;
+    }
+
+    return n;
+}
+
+
+// --------------------------------------------------------------
+// 调度器管理状态机
+// --------------------------------------------------------------
 void schSm_act_init(void *hStaRec)
-{}
+{
+    hschSmRec rec = (hschSmRec)hStaRec;
+
+    rec->casSch = &casSchA;
+
+    rec->next = schSm_sta_update;
+}
 void schSm_act_update(void *hStaRec)
-{}
+{
+    hschSmRec rec = (hschSmRec)hStaRec;
+    uint32 taskMask = 0;
+    uint32 curTask = 0;
+    int16 taskIndex = 0;
+    int16 i = 0;
+
+    for (i = 0; i < rec->task.taskGroupNum; i++)
+    {
+        // 更新各组激活任务
+        taskMask = rec->task.taskMask[i];
+        while (taskMask != 0)
+        {
+            curTask = (taskMask & (taskMask ^ (taskMask - 1)));
+            taskMask ^= curTask;
+            taskIndex = log_2n(curTask);
+
+            if ((rec->task.tick - rec->task.startTick[i][taskIndex]) >= rec->task.prdTick[i][taskIndex])
+            {
+                // 更新激活状态以及下一激活节拍
+                rec->task.actMask[i] |= curTask;
+                rec->task.startTick[i][taskIndex] += rec->task.prdTick[i][taskIndex];
+            }
+        }
+    }
+
+    // 所有任务更新后进入执行状态查看是否有要执行任务
+    rec->next = schSm_sta_execute;
+}
 void schSm_act_execute(void *hStaRec)
-{}
+{
+    hschSmRec rec = (hschSmRec)hStaRec;
+    uint32 taskMask = 0;
+    uint32 curTask = 0;
+    int16 taskIndex = 0;
+    int16 i = 0;
+    errCode errcode;
+
+    for (i = 0; i < rec->task.taskGroupNum; i++)
+    {
+        // 查看激活任务，并执行最高优先级任务
+        taskMask = rec->task.actMask[i];
+        if (taskMask != 0)
+        {
+            curTask = (taskMask & (taskMask ^ (taskMask - 1)));
+            //taskMask ^= curTask;
+            //rec->task.actMask[i] ^= curTask; // 容易引发不可控结果
+            rec->task.actMask[i] &= (~curTask);
+            taskIndex = log_2n(curTask);
+
+            // 判断是否为一次性任务，是则把任务掩码去除
+            if (rec->task.prdTick[i][taskIndex] == 0)
+            {
+                rec->task.taskMask[i] &= (~curTask);
+            }
+
+            // 检查任务执行是否有丢失
+            if ((rec->task.tick - rec->task.startTick[i][taskIndex]) >= rec->task.prdTick[i][taskIndex])
+            {
+                // 任务丢失则认为只丢失一个
+                errcode.id = (void *)(rec->task.taskGroup[i][taskIndex]);
+                errcode.cpnPartId = casSch_taskExecute_pi;
+                errcode.errClassify = EC_EC_se;
+                errcode.errRanking = EC_ER_serious;
+                errcode.errCode = casSch_taskExecute_task_miss;
+                ((hcasSch)rec->casSch)->err(rec->casSch, &errcode);
+
+                // 更新下一调度起始时间
+                rec->task.startTick[i][taskIndex] += rec->task.prdTick[i][taskIndex];
+            }
+            else if ((rec->task.tick - rec->task.startTick[i][taskIndex]) >= (rec->task.prdTick[i][taskIndex] >> 1))
+            {
+                errcode.id = (void *)(rec->task.taskGroup[i][taskIndex]);
+                errcode.cpnPartId = casSch_taskExecute_pi;
+                errcode.errClassify = EC_EC_se;
+                errcode.errRanking = EC_ER_warning;
+                errcode.errCode = casSch_taskExecute_task_delay;
+                ((hcasSch)rec->casSch)->err(rec->casSch, &errcode);
+            }
+            else
+            {
+                ;
+            }
+
+            // 执行任务
+            rec->task.taskGroup[i][taskIndex]();
+
+            break;
+        }
+    }
+
+    // 返回查询任务激活状态
+    rec->next = schSm_sta_update;
+}
 void schSm_act_default(void *hStaRec)
-{}
-
-
-hvfbOcasSch vfbOcasSch_init(hvfbOcasSch cthis,
-        void (*tickOut)(hvfbOcasSch t),
-        void (*err)(hvfbOcasSch t, herrCode code))
 {
-    cthis->tickOut = tickOut;
-    cthis->err = err;
+    hschSmRec rec = (hschSmRec)hStaRec;
+    errCode errcode;
 
-    return cthis;
+    errcode.id = (void *)rec;
+    errcode.cpnPartId = casSch_schSm_pi;
+    errcode.errClassify = EC_EC_se;
+    errcode.errRanking = EC_ER_serious;
+    errcode.errCode = casSch_schSm_sta_default;
+    ((hcasSch)rec->casSch)->err(rec->casSch, &errcode);
+
+    rec->next = schSm_sta_update;
 }
 
 
-CC(vfbOcasSch)
-{
-    cthis->init = vfbOcasSch_init;
-
-    return cthis;
-}
-
-CD(vfbOcasSch)
-{
-    return OOPC_TRUE;
-}
-
-
-
-hcasSch casSch_init(hcasSch cthis, hmeasure time)
+// --------------------------------------------------------------
+// 调度任务组件类定义
+// --------------------------------------------------------------
+hcasSch casSch_init(hcasSch cthis, hmeasure time, hvfbOcasSch vfbOcasSch)
 {
     cthis->time = time;
+    cthis->vfbOcasSch = vfbOcasSch;
 
     return cthis;
 }
 
 void casSch_timer(hcasSch t)
 {
-    t->tick++;
+    t->schSmRec.task.tick++;
+    t->tickOut(t);
 }
-
 void casSch_run(hcasSch t)
 {
-    ;
+    t->schSm[t->schSmRec.next](&t->schSmRec);
 }
 
 void casSch_tickOut(hcasSch t)
 {
-    ;
+    t->vfbOcasSch->tickOut(t->vfbOcasSch);
 }
 void casSch_err(hcasSch t, herrCode code)
 {
-    ;
+    t->vfbOcasSch->err(t->vfbOcasSch, code);
 }
 
-void casSch_addTask(hcasSch t, int16 id, void(*schTask)(void))
+void casSch_addTask(hcasSch t, int16 id, void(*schTask)(void), uint16 prdTick, uint16 startTick)
 {
-    ;
-}
+    errCode errcode;
+    uint32 taskMask = 0;
+    uint32 curTask = 0;
+    int16 taskGroup = 0;
+    int16 taskIndex = 0;
 
+    if (id > (t->schSmRec.task.taskGroupNum * 32))
+    {
+        errcode.id = (void *)t;
+        errcode.cpnPartId = casSch_addTask_pi;
+        errcode.errClassify = EC_EC_se;
+        errcode.errRanking = EC_ER_warning;
+        errcode.errCode = casSch_addTask_id_outOfRange;
+        t->err(t, &errcode);
+    }
+    else
+    {
+        taskGroup = (id >> 5);
+        taskIndex = (id & 0x001F);
+        curTask = ((uint32)1 << taskIndex);
+        taskMask = t->schSmRec.task.taskMask[taskGroup];
+
+        // 判断任务是否存在
+        if ((taskMask & curTask) != 0)
+        {
+            errcode.id = (void *)t;
+            errcode.cpnPartId = casSch_addTask_pi;
+            errcode.errClassify = EC_EC_se;
+            errcode.errRanking = EC_ER_warning;
+            errcode.errCode = casSch_addTask_task_exist;
+            t->err(t, &errcode);
+        }
+        else
+        {
+            t->schSmRec.task.taskMask[taskGroup] |= curTask;
+            t->schSmRec.task.taskGroup[taskGroup][taskIndex] = schTask;
+            t->schSmRec.task.prdTick[taskGroup][taskIndex] = prdTick;
+            t->schSmRec.task.startTick[taskGroup][taskIndex] = startTick;
+        }
+    }
+}
 void casSch_delTask(hcasSch t, int16 id, void(*schTask)(void))
 {
-    ;
+    errCode errcode;
+    uint32 taskMask = 0;
+    uint32 curTask = 0;
+    int16 taskGroup = 0;
+    int16 taskIndex = 0;
+
+    if (id > (t->schSmRec.task.taskGroupNum * 32))
+    {
+        errcode.id = (void *)t;
+        errcode.cpnPartId = casSch_delTask_pi;
+        errcode.errClassify = EC_EC_se;
+        errcode.errRanking = EC_ER_warning;
+        errcode.errCode = casSch_delTask_id_outOfRange;
+        t->err(t, &errcode);
+    }
+    else
+    {
+        taskGroup = (id >> 5);
+        taskIndex = (id & 0x001F);
+        curTask = ((uint32)1 << taskIndex);
+        taskMask = t->schSmRec.task.taskMask[taskGroup];
+
+        // 判断任务是否存在
+        if ((taskMask & curTask) == 0)
+        {
+            errcode.id = (void *)t;
+            errcode.cpnPartId = casSch_delTask_pi;
+            errcode.errClassify = EC_EC_se;
+            errcode.errRanking = EC_ER_warning;
+            errcode.errCode = casSch_delTask_task_null;
+            t->err(t, &errcode);
+        }
+        else
+        {
+            // 判断是否为目标任务
+            if (t->schSmRec.task.taskGroup[taskGroup][taskIndex] != schTask)
+            {
+                errcode.id = (void *)t;
+                errcode.cpnPartId = casSch_delTask_pi;
+                errcode.errClassify = EC_EC_se;
+                errcode.errRanking = EC_ER_warning;
+                errcode.errCode = casSch_delTask_task_false;
+                t->err(t, &errcode);
+            }
+            else
+            {
+                t->schSmRec.task.actMask[taskGroup] &= (~curTask);
+                t->schSmRec.task.taskMask[taskGroup] &= (~curTask);
+                t->schSmRec.task.taskGroup[taskGroup][taskIndex] = schTaskDefault;
+                t->schSmRec.task.prdTick[taskGroup][taskIndex] = 0;
+                t->schSmRec.task.startTick[taskGroup][taskIndex] = 0;
+            }
+        }
+    }
 }
 
 CC(casSch)
@@ -92,66 +309,48 @@ CC(casSch)
     cthis->addTask = casSch_addTask;
     cthis->delTask = casSch_delTask;
 
-    cthis->tick = 0;
-    cthis->task.taskGroupNum = SCH_TASK_GROUP_NUM;
-    for (i = 0; i < cthis->task.taskGroupNum; i++)
+    cthis->schSmRec.next = schSm_sta_init;
+    cthis->schSmRec.task.tick = 0;
+    cthis->schSmRec.task.taskGroupNum = SCH_TASK_GROUP_NUM;
+    for (i = 0; i < cthis->schSmRec.task.taskGroupNum; i++)
     {
-        cthis->task.actTick[i] = 0;
-        cthis->task.prdTick[i] = 0;
-        cthis->task.actMask[i] = 0;
-        cthis->task.taskMask[i] = 0;
+        cthis->schSmRec.task.actMask[i] = 0;
+        cthis->schSmRec.task.taskMask[i] = 0;
+
         for (j = 0; j < 32; j++)
         {
-            cthis->task.taskGroup[i][j] = 0;
+            cthis->schSmRec.task.startTick[i][j] = 0;
+            cthis->schSmRec.task.prdTick[i][j] = 0;
+            cthis->schSmRec.task.taskGroup[i][j] = schTaskDefault;
         }
     }
-    cthis->schSmRec.next = schSm_sta_init;
+    cthis->schSm[schSm_sta_init] = schSm_act_init;
+    cthis->schSm[schSm_sta_update] = schSm_act_update;
+    cthis->schSm[schSm_sta_execute] = schSm_act_execute;
+    cthis->schSm[schSm_sta_default] = schSm_act_default;
 
     return cthis;
 }
-
-
-void casSch_timer_bsp(void)
-{}
-void casSch_mainLoop_bsp(void)
-{}
-
-
-
-
-hvfbIcasSch vfbIcasSch_init(hvfbIcasSch cthis)
-{
-    return cthis;
-}
-void vfbIcasSch_addTask(hvfbIcasSch t, int16 id, void(*schTask)(void))
-{
-    t->casSch->addTask(t->casSch, id, schTask);
-}
-void vfbIcasSch_delTask(hvfbIcasSch t, int16 id, void(*schTask)(void))
-{
-    t->casSch->delTask(t->casSch, id, schTask);
-}
-
-CC(vfbIcasSch)
-{
-    cthis->init = vfbIcasSch_init;
-    cthis->addTask = vfbIcasSch_addTask;
-    cthis->delTask = vfbIcasSch_delTask;
-
-    return cthis;
-}
-
-CD(vfbIcasSch)
+CD(casSch)
 {
     return OOPC_TRUE;
 }
 
+// --------------------------------------------------------------
+// 异步调度功能函数
+// --------------------------------------------------------------
+void abi_casSch_timer(void)
+{
+    casSchA.timer(casSchA.self);
+}
+void abi_casSch_mainLoop(void)
+{
+    casSchA.run(casSchA.self);
+}
 
 
-
-
-
-
-
-
+// --------------------------------------------------------------
+// 组件类实例化
+// --------------------------------------------------------------
+casSch casSchA;
 
