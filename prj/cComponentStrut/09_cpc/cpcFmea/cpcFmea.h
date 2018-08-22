@@ -1,37 +1,39 @@
 /*
- * cpcFdam.h
+ * cpcFmea.h
  *
- *  Created on: 2018年8月18日
+ *  Created on: 2018年8月22日
  *      Author: pxf
  */
 
-#ifndef CPCFDAM_H_
-#define CPCFDAM_H_
+#ifndef CPCFMEA_H_
+#define CPCFMEA_H_
 
 #include "..\..\01_std\std.h"
 #include "..\..\02_bm\fifo\fifo.h"
+#include "..\..\06_cas\casSch\casSch.h"
+#include "cpcFmeaCfg.h"
 
 // --------------------------------------------------------------
 // 组件初始化
 // --------------------------------------------------------------
 // 组件输入初始化------------------------
 // 0成功，-1失败
-int16 vfbIcpcFdamInit(void);
+int16 vfbIcpcFmeaInit(void);
 
 // 组件初始化----------------------------
-int16 cpcFdamInit(void);
+int16 cpcFmeaInit(void);
 
 // 组件输出初始化------------------------
-int16 vfbOcpcFdamInit(void);
+int16 vfbOcpcFmeaInit(void);
 
 // 管理组件初始化外部声明----------------
-extern int16 vfbMcpcFdamInit(void);
+extern int16 vfbMcpcFmeaInit(void);
 
 // --------------------------------------------------------------
 // 组件调度
 // --------------------------------------------------------------
 // 组件进行调度--------------------------
-void cpcFdamSch(void);
+void cpcFmeaSch(void);
 
 // --------------------------------------------------------------
 // 抽象输入类通用数据类型
@@ -45,16 +47,18 @@ void cpcFdamSch(void);
 // 抽象输出类定义
 // --------------------------------------------------------------
 // 抽象输出类声明------------------------
-CL(vfbOcpcFdam)
+CL(vfbOcpcFmea)
 {
-    hvfbOcpcFdam self;
-    hvfbOcpcFdam (*init)(hvfbOcpcFdam cthis);
+    hvfbOcpcFmea self;
+    hvfbOcpcFmea (*init)(hvfbOcpcFmea cthis);
+
+    schParam schParam;
 };
 
 // 外部接口声明--------------------------
 
 // 抽象输出类实例------------------------
-extern vfbOcpcFdam vfbOcpcFdamA;
+extern vfbOcpcFmea vfbOcpcFmeaA;
 
 // --------------------------------------------------------------
 // 组件类定义
@@ -66,19 +70,20 @@ extern vfbOcpcFdam vfbOcpcFdamA;
 SMDC(errDisposeSm, ERR_DISPOSE_SM_LIST)
 {
     sta next;
-    void *cpcFdam;
+    void *cpcFmea;
 };
 // 错误缓存队列定义----------------------
-#define ERR_FIFO_LEN     20  // 一次处理最多存储19条错误信息
+#define ERR_FIFO_LEN     ERR_FIFO_LEN_CFG  // 一次处理最多存储错误信息
 extern errCode errCodeBuff[ERR_FIFO_LEN];
 extern fifo errCodeFifo;
 
 // 组件类声明----------------------------
-CL(cpcFdam)
+CL(cpcFmea)
 {
-    hcpcFdam self;
-    hcpcFdam (*init)(hcpcFdam cthis, hvfbOcpcFdam vfbOcpcFdam,
-            hfifo errCodeFifo, void *listBuffer, int16 listBuffSize, int16 fifoObjSize);
+    hcpcFmea self;
+    hcpcFmea (*init)(hcpcFmea cthis, hvfbOcpcFmea vfbOcpcFmea,
+            hfifo errCodeFifo, void *listBuffer, int16 listBuffSize, int16 fifoObjSize,
+            hstaAct errDisposeSm);
 
     uint32 errCnt;
     // 0  ignore    可忽视
@@ -99,13 +104,14 @@ CL(cpcFdam)
     uint32 errFeCnt;
 
     errDisposeSmRec errDisposeSmRec;
-    staAct errDisposeSm[errDisposeSm_sta_default + 1];
+    hstaAct errDisposeSm;
 
-    void (*saveErrCode)(hcpcFdam t, herrCode code);
-//    void (*getErrCode)(hcpcFdam t, herrCode code);
-    void (*run)(hcpcFdam t);
+//    schParam schParam;
 
-    INJ(vfbOcpcFdam, vfbOcpcFdam);
+    void (*saveErrCode)(hcpcFmea t, herrCode code);
+    void (*run)(hcpcFmea t);
+
+    INJ(vfbOcpcFmea, vfbOcpcFmea);
     EXT(fifo);
 };
 
@@ -113,23 +119,25 @@ CL(cpcFdam)
 
 
 // 组件类实例----------------------------
-extern cpcFdam cpcFdamA;
+extern cpcFmea cpcFmeaA;
 
 // --------------------------------------------------------------
 // 抽象输入类定义
 // --------------------------------------------------------------
 // 抽象输入类声明------------------------
-CL(vfbIcpcFdam)
+CL(vfbIcpcFmea)
 {
-    hvfbIcpcFdam self;
-    hvfbIcpcFdam (*init)(hvfbIcpcFdam cthis, hcpcFdam cpcFdam);
+    hvfbIcpcFmea self;
+    hvfbIcpcFmea (*init)(hvfbIcpcFmea cthis, hcpcFmea cpcFmea);
 
-    void (*saveErrCode)(hvfbIcpcFdam t, herrCode code);
+//    schParam schParam;
 
-    INJ(cpcFdam, cpcFdam);
+    void (*saveErrCode)(hvfbIcpcFmea t, herrCode code);
+
+    INJ(cpcFmea, cpcFmea);
 };
 
 // 抽象输入类实例------------------------
-extern vfbIcpcFdam vfbIcpcFdamA;
+extern vfbIcpcFmea vfbIcpcFmeaA;
 
-#endif /* CPCFDAM_H_ */
+#endif /* CPCFMEA_H_ */

@@ -1,24 +1,24 @@
 /*
- * vfbOcpcFdam.c
+ * vfbOcpcFmea.c
  *
- *  Created on: 2018年8月18日
+ *  Created on: 2018年8月22日
  *      Author: pxf
  */
 
-#include "cpcFdam.h"
+#include "cpcFmea.h"
 
 // --------------------------------------------------------------
 // 组件输出初始化
 // --------------------------------------------------------------
 // 组件输出初始化------------------------
-int16 vfbOcpcFdamInit(void)
+int16 vfbOcpcFmeaInit(void)
 {
     int16 rtv = 0;
 
-    CNNP(vfbOcpcFdam, &vfbOcpcFdamA);
-    if (OPRS(vfbOcpcFdamA) != OOPC_NULL)
+    CNNP(vfbOcpcFmea, &vfbOcpcFmeaA);
+    if (OPRS(vfbOcpcFmeaA) != OOPC_NULL)
     {
-        rtv = vfbMcpcFdamInit();
+        rtv = vfbMcpcFmeaInit();
     }
     else
     {
@@ -32,18 +32,23 @@ int16 vfbOcpcFdamInit(void)
 // --------------------------------------------------------------
 // 抽象输出类定义
 // --------------------------------------------------------------
-hvfbOcpcFdam vfbOcpcFdam_init(hvfbOcpcFdam cthis)
+hvfbOcpcFmea vfbOcpcFmea_init(hvfbOcpcFmea cthis)
 {
     return cthis;
 }
 
-CC(vfbOcpcFdam)
+CC(vfbOcpcFmea)
 {
-    cthis->init = vfbOcpcFdam_init;
+    cthis->init = vfbOcpcFmea_init;
+
+    cthis->schParam.id = 0;
+    cthis->schParam.schTask = cpcFmeaSch;
+    cthis->schParam.startTick = (CPCFMEA_START_TICK_CFG / CASSCH_TIMER_PRD_CFG);
+    cthis->schParam.prdTick = (CPCFMEA_PRD_TICK_CFG / CASSCH_TIMER_PRD_CFG);
 
     return cthis;
 }
-CD(vfbOcpcFdam)
+CD(vfbOcpcFmea)
 {
     return OOPC_TRUE;
 }
@@ -51,4 +56,4 @@ CD(vfbOcpcFdam)
 // --------------------------------------------------------------
 // 抽象输出类实例化
 // --------------------------------------------------------------
-vfbOcpcFdam vfbOcpcFdamA;
+vfbOcpcFmea vfbOcpcFmeaA;

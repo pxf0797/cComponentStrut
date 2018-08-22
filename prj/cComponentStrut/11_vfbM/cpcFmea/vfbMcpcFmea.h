@@ -1,20 +1,20 @@
 /*
- * vfbMcpcFdam.h
+ * vfbMcpcFmea.h
  *
- *  Created on: 2018年8月18日
+ *  Created on: 2018年8月22日
  *      Author: pxf
  */
 
-#ifndef VFBMCPCFDAM_H_
-#define VFBMCPCFDAM_H_
+#ifndef VFBMCPCFMEA_H_
+#define VFBMCPCFMEA_H_
 
-#include "..\..\09_cpc\cpcFdam\cpcFdam.h"
+#include "..\..\09_cpc\cpcFmea\cpcFmea.h"
 
 // --------------------------------------------------------------
 // 管理组件初始化
 // --------------------------------------------------------------
 // 管理组件初始化------------------------
-int16 vfbMcpcFdamInit(void);
+int16 vfbMcpcFmeaInit(void);
 
 
 
@@ -22,12 +22,13 @@ int16 vfbMcpcFdamInit(void);
 // 组件管理类定义
 // --------------------------------------------------------------
 // 组件管理类声明------------------------
-CL(vfbMcpcFdam)
+CL(vfbMcpcFmea)
 {
-    hvfbMcpcFdam self;
-    hvfbMcpcFdam (*init)(hvfbMcpcFdam cthis);
+    hvfbMcpcFmea self;
+    hvfbMcpcFmea (*init)(hvfbMcpcFmea cthis, hvfbOcpcFmea vfbOcpcFmea, hvfbIcasSch vfbIcasSch);
 
-    INJ(cpcFdam, cpcFdam);
+    INJ(vfbOcpcFmea, vfbOcpcFmea);
+    INJ(vfbIcasSch, vfbIcasSch);
 };
 
 // 输出类接口声明------------------------
@@ -35,6 +36,6 @@ CL(vfbMcpcFdam)
 
 
 // 组件管理类实例------------------------
-extern vfbMcpcFdam vfbMcpcFdamA;
+extern vfbMcpcFmea vfbMcpcFmeaA;
 
-#endif /* VFBMCPCFDAM_H_ */
+#endif /* VFBMCPCFMEA_H_ */

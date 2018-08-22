@@ -1,33 +1,24 @@
 /*
- * abi.c
+ * abicsLedServ.h
  *
- *  Created on: 2018年8月17日
+ *  Created on: 2018年8月22日
  *      Author: pxf
  */
 
-#include "abi.h"
+#ifndef ABICSLEDSERV_H_
+#define ABICSLEDSERV_H_
+
+#include "..\abi.h"
 
 // --------------------------------------------------------------
-// 组组件输入初始化
+// 组件抽象接口初始化
 // --------------------------------------------------------------
-int16 vfbIabiInit(void)
-{
-    return abiInit();
-}
+int16 abicsLedServInit(void);
 
 // --------------------------------------------------------------
-// 组件初始化
+// 组件抽象接口
 // --------------------------------------------------------------
-int16 abiInit(void)
-{
-    int16 rtv = 0;
+// 输出类抽象接口------------------------
+extern go led;
 
-    rtv += abicasSchInit();
-    rtv += abicsLedServInit();
-
-    return rtv;
-}
-
-
-
-
+#endif /* ABICSLEDSERV_H_ */

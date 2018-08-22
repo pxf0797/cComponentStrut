@@ -13,7 +13,7 @@
 
 #include ".\standType\standType.h"
 #include ".\oopc_v1.02\oopc.h"
-#include ".\sm_v1.00\sm.h"
+#include ".\sm_v1.01\sm.h"
 #include ".\errCode\errCode.h"
 
 #endif /* STD_H_ */

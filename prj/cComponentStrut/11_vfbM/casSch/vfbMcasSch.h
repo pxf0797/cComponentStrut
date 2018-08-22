@@ -9,6 +9,7 @@
 #define VFBMCASSCH_H_
 
 #include "..\..\06_cas\casSch\casSch.h"
+#include "..\vfbMCfg.h"
 
 // --------------------------------------------------------------
 // 管理组件初始化
@@ -24,10 +25,12 @@ int16 vfbMcasSchInit(void);
 CL(vfbMcasSch)
 {
     hvfbMcasSch self;
-    hvfbMcasSch (*init)(hvfbMcasSch cthis);
+    hvfbMcasSch (*init)(hvfbMcasSch cthis, hvfbOcasSch vfbOcasSch);
 
     void (*tickOut)(hvfbMcasSch t);
     void (*err)(hvfbMcasSch t, herrCode code);
+
+    INJ(vfbOcasSch, vfbOcasSch);
 };
 
 // 输出类接口声明------------------------

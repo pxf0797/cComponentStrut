@@ -6,7 +6,7 @@
  */
 
 #include "vfbMcasSch.h"
-#include "..\..\09_cpc\cpcFdam\cpcFdam.h"
+#include "..\..\09_cpc\cpcFmea\cpcFmea.h"
 
 
 // --------------------------------------------------------------
@@ -15,16 +15,19 @@
 int16 vfbMcasSchInit(void)
 {
     int16 rtv = 0;
-    int16 id = 0;
 
-    CNNP(vfbMcasSch, &vfbMcasSchA);
+    CN(vfbMcasSch, &vfbMcasSchA, &vfbOcasSchA);
     if (OPRS(vfbMcasSchA) != OOPC_NULL)
     {
-        rtv = vfbIcpcFdamInit();
+        rtv = vfbIcpcFmeaInit();
         if (rtv == 0)
         {
-            vfbIcasSchA.addTask(vfbIcasSchA.self, id, cpcFdamSch, 10000, 11);
-            id++;
+            vfbOcpcFmeaA.schParam.id = cpcFmea_id_priority_cfg;
+            vfbOcpcFmeaA.schParam.prdTick = (CPCFMEA_PRD_TICK_CFG / CASSCH_TIMER_PRD_CFG);
+            vfbOcpcFmeaA.schParam.startTick = (CPCFMEA_START_TICK_CFG / CASSCH_TIMER_PRD_CFG);
+            vfbIcasSchA.addTask(vfbIcasSchA.self,
+                    vfbOcpcFmeaA.schParam.id, vfbOcpcFmeaA.schParam.schTask,
+                    vfbOcpcFmeaA.schParam.prdTick, vfbOcpcFmeaA.schParam.startTick);
         }
 
     }
@@ -40,8 +43,9 @@ int16 vfbMcasSchInit(void)
 // --------------------------------------------------------------
 // 组件管理类定义
 // --------------------------------------------------------------
-hvfbMcasSch hvfbMcasSch_init(hvfbMcasSch cthis)
+hvfbMcasSch hvfbMcasSch_init(hvfbMcasSch cthis, hvfbOcasSch vfbOcasSch)
 {
+    cthis->vfbOcasSch = vfbOcasSch;
     return cthis;
 }
 

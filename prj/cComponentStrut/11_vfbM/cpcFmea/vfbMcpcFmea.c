@@ -1,22 +1,22 @@
 /*
- * vfbMcpcFdam.c
+ * vfbMcpcFmea.c
  *
- *  Created on: 2018年8月18日
+ *  Created on: 2018年8月22日
  *      Author: pxf
  */
 
-#include "vfbMcpcFdam.h"
+#include "vfbMcpcFmea.h"
 
 // --------------------------------------------------------------
 // 管理组件初始化
 // --------------------------------------------------------------
 // 管理组件初始化------------------------
-int16 vfbMcpcFdamInit(void)
+int16 vfbMcpcFmeaInit(void)
 {
     int16 rtv = 0;
 
-    CNNP(vfbMcpcFdam, &vfbMcpcFdamA);
-    if (OPRS(vfbMcpcFdamA) != OOPC_NULL)
+    CN(vfbMcpcFmea, &vfbMcpcFmeaA, &vfbOcpcFmeaA, &vfbIcasSchA);
+    if (OPRS(vfbMcpcFmeaA) != OOPC_NULL)
     {
         rtv = 0;
     }
@@ -29,22 +29,24 @@ int16 vfbMcpcFdamInit(void)
 }
 
 
-
 // --------------------------------------------------------------
 // 组件管理类定义
 // --------------------------------------------------------------
-hvfbMcpcFdam vfbMcpcFdam_init(hvfbMcpcFdam cthis)
+hvfbMcpcFmea vfbMcpcFmea_init(hvfbMcpcFmea cthis, hvfbOcpcFmea vfbOcpcFmea, hvfbIcasSch vfbIcasSch)
 {
-    return cthis;
-}
-
-CC(vfbMcpcFdam)
-{
-    cthis->init = vfbMcpcFdam_init;
+    cthis->vfbOcpcFmea = vfbOcpcFmea;
+    cthis->vfbIcasSch = vfbIcasSch;
 
     return cthis;
 }
-CD(vfbMcpcFdam)
+
+CC(vfbMcpcFmea)
+{
+    cthis->init = vfbMcpcFmea_init;
+
+    return cthis;
+}
+CD(vfbMcpcFmea)
 {
     return OOPC_TRUE;
 }
@@ -59,4 +61,4 @@ CD(vfbMcpcFdam)
 // --------------------------------------------------------------
 // 组件管理类实例
 // --------------------------------------------------------------
-vfbMcpcFdam vfbMcpcFdamA;
+vfbMcpcFmea vfbMcpcFmeaA;

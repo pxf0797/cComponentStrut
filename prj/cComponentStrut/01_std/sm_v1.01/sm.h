@@ -12,17 +12,20 @@
  *                5.状态机创建第五步使用宏SMR为状态机给入时钟对状态机进行驱动；
  * Others       : 无
  * History      : 180310 pxf 初次建立
+ *                180819 pxf 1.增加状态机指针hstaAct/hhstaAct；
+ *                           2.增加状态机指针运行宏SMRE
  ************************************************/
 
 #ifndef SM_H_
 #define SM_H_
 
 // 版本定义---------------------------------------------------------------------
-#define SM_VERSION    0xC01D00          // C代表v，D代表.，版本v1.00
+#define SM_VERSION    0xC01D01          // C代表v，D代表.，版本v1.01
 
 // 基本类型定义
 typedef unsigned char sta;
 typedef void (*staAct)(void *hStaRec);  // state action
+typedef staAct *hstaAct, **hhstaAct;    // 状态机指针
 
 // 状态及状态输出
 #define SD(sm_type, sm_sta) sm_type##_sta_##sm_sta,                       // state define 注意后有","，各状态定义
@@ -78,5 +81,8 @@ do                                                              \
     static sm_type##Rec sm_type##RunRec = {sm_type##_sta_init}; \
     sm_type[sm_type##RunRec.next](&sm_type##RunRec);            \
 } while (0)
+// state machine run entity 使用状态机指针运行
+// 当前是在有状态机指针定义情况下，不使用SMR运行状态机
+#define SMRE(sm_entity_ptr, sm_rec)  (sm_entity_ptr)[(sm_rec).next](&(sm_rec))
 
 #endif /* SM_H_ */

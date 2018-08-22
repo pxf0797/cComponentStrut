@@ -8,6 +8,7 @@
 #include "casSch.h"
 #include "..\..\04_abi\abi.h"
 #include "..\..\11_vfbM\casSch\vfbMcasSch.h"
+#include "..\..\02_bm\func\func.h"
 
 // --------------------------------------------------------------
 // 组件初始化
@@ -17,7 +18,7 @@ int16 casSchInit(void)
 {
     int16 rtv = 0;
 
-    CN(casSch, &casSchA, &time, &vfbOcasSchA);
+    CN(casSch, &casSchA, &time, &vfbOcasSchA, &schSm[0]);
     if (OPRS(casSchA) != OOPC_NULL)
     {
         rtv = vfbOcasSchInit();
@@ -75,6 +76,8 @@ static inline int16 log_2n(uint32 num)
 // --------------------------------------------------------------
 // 调度器管理状态机
 // --------------------------------------------------------------
+SMDF(schSm, SCH_SM_STA_LIST);
+
 void schSm_act_init(void *hStaRec)
 {
     hschSmRec rec = (hschSmRec)hStaRec;
@@ -121,6 +124,11 @@ void schSm_act_execute(void *hStaRec)
     int16 taskIndex = 0;
     int16 i = 0;
     errCode errcode;
+#if (CASSCH_TASK_MEASURE_ENABLE == 1)
+    static uint32 taskTimePot = 0;
+    uint32 currUsage = 0;
+    ((hcasSch)rec->casSch)->time->iMeasure.start(&taskTimePot);
+#endif
 
     for (i = 0; i < rec->task.taskGroupNum; i++)
     {
@@ -177,6 +185,15 @@ void schSm_act_execute(void *hStaRec)
 
     // 返回查询任务激活状态
     rec->next = schSm_sta_update;
+
+#if (CASSCH_TASK_MEASURE_ENABLE == 1)
+    ((hcasSch)rec->casSch)->taskTime = ((hcasSch)rec->casSch)->time->iMeasure.end(taskTimePot);
+    // 当前使用率需要用taskTime根据CASSCH_TIMER_PRD_CFG/CASSCH_TIME_MEASURE_PRECISION_CFG进行计算
+    // 目前时间测量精确到0.1us，使用率精确到0.1%，比值关系需要满足1000倍关系，所以taskTime刚好满足
+    //currUsage = (((hcasSch)rec->casSch)->taskTime / ((CASSCH_TIMER_PRD_CFG / CASSCH_TIME_MEASURE_PRECISION_CFG) / 1000.0L));
+    currUsage = ((hcasSch)rec->casSch)->taskTime;
+    ((hcasSch)rec->casSch)->usage = lowpassFilter(currUsage, ((hcasSch)rec->casSch)->usage, 3);
+#endif
 }
 void schSm_act_default(void *hStaRec)
 {
@@ -197,10 +214,11 @@ void schSm_act_default(void *hStaRec)
 // --------------------------------------------------------------
 // 调度任务组件类定义
 // --------------------------------------------------------------
-hcasSch casSch_init(hcasSch cthis, hmeasure time, hvfbOcasSch vfbOcasSch)
+hcasSch casSch_init(hcasSch cthis, hmeasure time, hvfbOcasSch vfbOcasSch, hstaAct schSm)
 {
     cthis->time = time;
     cthis->vfbOcasSch = vfbOcasSch;
+    cthis->schSm = schSm;
 
     return cthis;
 }
@@ -212,7 +230,7 @@ void casSch_timer(hcasSch t)
 }
 void casSch_run(hcasSch t)
 {
-    t->schSm[t->schSmRec.next](&t->schSmRec);
+    SMRE(t->schSm, t->schSmRec);
 }
 
 void casSch_tickOut(hcasSch t)
@@ -338,6 +356,9 @@ CC(casSch)
     cthis->addTask = casSch_addTask;
     cthis->delTask = casSch_delTask;
 
+    cthis->usage = 0;
+    cthis->taskTime = 0;
+
     cthis->schSmRec.next = schSm_sta_init;
     cthis->schSmRec.task.tick = 0;
     cthis->schSmRec.task.taskGroupNum = SCH_TASK_GROUP_NUM;
@@ -353,10 +374,6 @@ CC(casSch)
             cthis->schSmRec.task.taskGroup[i][j] = schTaskDefault;
         }
     }
-    cthis->schSm[schSm_sta_init] = schSm_act_init;
-    cthis->schSm[schSm_sta_update] = schSm_act_update;
-    cthis->schSm[schSm_sta_execute] = schSm_act_execute;
-    cthis->schSm[schSm_sta_default] = schSm_act_default;
 
     return cthis;
 }
@@ -368,11 +385,11 @@ CD(casSch)
 // --------------------------------------------------------------
 // 异步调度功能函数
 // --------------------------------------------------------------
-void abi_casSch_timer(void)
+void casSch_abi_timer(void)
 {
     casSchA.timer(casSchA.self);
 }
-void abi_casSch_mainLoop(void)
+void casSch_abi_mainLoop(void)
 {
     casSchA.run(casSchA.self);
 }

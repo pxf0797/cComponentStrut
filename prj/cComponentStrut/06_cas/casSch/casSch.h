@@ -11,6 +11,7 @@
 #include "..\..\01_std\std.h"
 #include "..\..\04_abi\abi.h"
 #include "casSchErrCode.h"
+#include "casSchCfg.h"
 
 // --------------------------------------------------------------
 // 组件初始化
@@ -69,8 +70,8 @@ extern vfbOcasSch vfbOcasSchA;
 // 组件类定义
 // --------------------------------------------------------------
 // 任务组--------------------------------
-#define SCH_TASK_GROUP_NUM  3  // 调度任务组设置
-typedef void(*schTask)(void);  // 通用调度任务类型
+#define SCH_TASK_GROUP_NUM  SCH_TASK_GROUP_NUM_CFG   // 调度任务组设置
+typedef void(*schTask)(void);                        // 通用调度任务类型
 // 任务管理组定义
 typedef struct
 {
@@ -98,14 +99,25 @@ SMDC(schSm, SCH_SM_STA_LIST)
     void *casSch;
 };
 
+// 组件调度调度参数（其他组件必含成员）-----
+typedef struct
+{
+    int16 id;                // 组件调度id，由组件初始化时分配
+    void(*schTask)(void);    // 调度组件
+    uint16 startTick;        // 调度周期起始节拍
+    uint16 prdTick;          // 周期调度节拍
+} schParam;
+
 // 调度任务组件类声明----------------------
 CL(casSch)
 {
     hcasSch self;
-    hcasSch (*init)(hcasSch cthis, hmeasure time, hvfbOcasSch vfbOcasSch);
+    hcasSch (*init)(hcasSch cthis, hmeasure time, hvfbOcasSch vfbOcasSch, hstaAct schSm);
 
     schSmRec schSmRec;
-    staAct schSm[schSm_sta_default + 1];
+    hstaAct schSm;
+    uint32 usage;        // cpu使用率，如112表示11.2%
+    uint32 taskTime;     // 当前任务执行时间，与时间测量结果一致
 
     // 自身功能函数
     void (*timer)(hcasSch t);
@@ -124,8 +136,8 @@ CL(casSch)
 };
 
 // 异步调度功能函数---------------------------
-void abi_casSch_timer(void);
-void abi_casSch_mainLoop(void);
+void casSch_abi_timer(void);
+void casSch_abi_mainLoop(void);
 
 // 组件类实例---------------------------------
 extern casSch casSchA;

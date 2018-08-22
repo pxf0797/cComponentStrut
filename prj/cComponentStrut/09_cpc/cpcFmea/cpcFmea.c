@@ -1,25 +1,26 @@
 /*
- * cpcFdam.c
+ * cpcFmea.c
  *
- *  Created on: 2018年8月18日
+ *  Created on: 2018年8月22日
  *      Author: pxf
  */
 
-#include "cpcFdam.h"
+#include "cpcFmea.h"
 
 // --------------------------------------------------------------
 // 组件初始化
 // --------------------------------------------------------------
 // 组件初始化------------------------
-int16 cpcFdamInit(void)
+int16 cpcFmeaInit(void)
 {
     int16 rtv = 0;
 
-    CN(cpcFdam, &cpcFdamA, &vfbOcpcFdamA,
-            &errCodeFifo, errCodeBuff, sizeof(errCodeBuff), sizeof(errCode));
-    if (OPRS(cpcFdamA) != OOPC_NULL)
+    CN(cpcFmea, &cpcFmeaA, &vfbOcpcFmeaA,
+            &errCodeFifo, errCodeBuff, sizeof(errCodeBuff), sizeof(errCode),
+            &errDisposeSm[0]);
+    if (OPRS(cpcFmeaA) != OOPC_NULL)
     {
-        rtv = vfbOcpcFdamInit();
+        rtv = vfbOcpcFmeaInit();
     }
     else
     {
@@ -33,9 +34,9 @@ int16 cpcFdamInit(void)
 // 组件调度
 // --------------------------------------------------------------
 // 组件进行调度--------------------------
-void cpcFdamSch(void)
+void cpcFmeaSch(void)
 {
-    cpcFdamA.run(cpcFdamA.self);
+    cpcFmeaA.run(cpcFmeaA.self);
 }
 
 
@@ -48,18 +49,20 @@ void cpcFdamSch(void)
 // --------------------------------------------------------------
 // 错误处理状态机定义
 // --------------------------------------------------------------
+SMDF(errDisposeSm, ERR_DISPOSE_SM_LIST);
+
 void errDisposeSm_act_init(void *hStaRec)
 {
     herrDisposeSmRec rec = (herrDisposeSmRec)hStaRec;
 
-    rec->cpcFdam = (void *)&cpcFdamA;
+    rec->cpcFmea = (void *)&cpcFmeaA;
     rec->next = errDisposeSm_sta_polling;
 }
 void errDisposeSm_act_polling(void *hStaRec)
 {
     herrDisposeSmRec rec = (herrDisposeSmRec)hStaRec;
 
-    if (((hcpcFdam)rec->cpcFdam)->fifo->currLen != 0)
+    if (((hcpcFmea)rec->cpcFmea)->fifo->currLen != 0)
     {
         rec->next = errDisposeSm_sta_dispose;
     }
@@ -73,27 +76,27 @@ void errDisposeSm_act_dispose(void *hStaRec)
     herrDisposeSmRec rec = (herrDisposeSmRec)hStaRec;
     errCode code;
 
-    while (((hcpcFdam)rec->cpcFdam)->fifo->currLen != 0)
+    while (((hcpcFmea)rec->cpcFmea)->fifo->currLen != 0)
     {
-        ((hcpcFdam)rec->cpcFdam)->fifo->pop(((hcpcFdam)rec->cpcFdam)->fifo, &code);
-        ((hcpcFdam)rec->cpcFdam)->errCnt++;
+        ((hcpcFmea)rec->cpcFmea)->fifo->pop(((hcpcFmea)rec->cpcFmea)->fifo, &code);
+        ((hcpcFmea)rec->cpcFmea)->errCnt++;
 
         // 更新各错误等级计数
         if (code.errRanking == EC_ER_ignore)
         {
-            ((hcpcFdam)rec->cpcFdam)->errIgnoreCnt++;
+            ((hcpcFmea)rec->cpcFmea)->errIgnoreCnt++;
         }
         else if (code.errRanking == EC_ER_warning)
         {
-            ((hcpcFdam)rec->cpcFdam)->errWarningCnt++;
+            ((hcpcFmea)rec->cpcFmea)->errWarningCnt++;
         }
         else if (code.errRanking == EC_ER_serious)
         {
-            ((hcpcFdam)rec->cpcFdam)->errSeriousCnt++;
+            ((hcpcFmea)rec->cpcFmea)->errSeriousCnt++;
         }
         else if (code.errRanking == EC_ER_fatal)
         {
-            ((hcpcFdam)rec->cpcFdam)->errFatalCnt++;
+            ((hcpcFmea)rec->cpcFmea)->errFatalCnt++;
         }
         else
         {
@@ -103,19 +106,19 @@ void errDisposeSm_act_dispose(void *hStaRec)
         // 更新各错误分类计数
         if (code.errClassify == EC_EC_cie)
         {
-            ((hcpcFdam)rec->cpcFdam)->errCieCnt++;
+            ((hcpcFmea)rec->cpcFmea)->errCieCnt++;
         }
         else if (code.errClassify == EC_EC_coe)
         {
-            ((hcpcFdam)rec->cpcFdam)->errCoeCnt++;
+            ((hcpcFmea)rec->cpcFmea)->errCoeCnt++;
         }
         else if (code.errClassify == EC_EC_se)
         {
-            ((hcpcFdam)rec->cpcFdam)->errSeCnt++;
+            ((hcpcFmea)rec->cpcFmea)->errSeCnt++;
         }
         else if (code.errClassify == EC_EC_fe)
         {
-            ((hcpcFdam)rec->cpcFdam)->errFeCnt++;
+            ((hcpcFmea)rec->cpcFmea)->errFeCnt++;
         }
         else
         {
@@ -139,10 +142,12 @@ void errDisposeSm_act_default(void *hStaRec)
 errCode errCodeBuff[ERR_FIFO_LEN];
 fifo errCodeFifo;
 
-hcpcFdam cpcFdam_init(hcpcFdam cthis, hvfbOcpcFdam vfbOcpcFdam,
-        hfifo errCodeFifo, void *listBuffer, int16 listBuffSize, int16 fifoObjSize)
+hcpcFmea cpcFmea_init(hcpcFmea cthis, hvfbOcpcFmea vfbOcpcFmea,
+        hfifo errCodeFifo, void *listBuffer, int16 listBuffSize, int16 fifoObjSize,
+        hstaAct errDisposeSm)
 {
-    cthis->vfbOcpcFdam = vfbOcpcFdam;
+    cthis->vfbOcpcFmea = vfbOcpcFmea;
+    cthis->errDisposeSm = errDisposeSm;
 
     CCC(fifo, errCodeFifo, listBuffer, listBuffSize, fifoObjSize);
     if (OPRS(*errCodeFifo) == OOPC_NULL)
@@ -154,25 +159,20 @@ hcpcFdam cpcFdam_init(hcpcFdam cthis, hvfbOcpcFdam vfbOcpcFdam,
     return cthis;
 }
 
-void cpcFdam_saveErrCode(hcpcFdam t, herrCode code)
+void cpcFmea_saveErrCode(hcpcFmea t, herrCode code)
 {
     t->fifo->push(t->fifo, code);
 }
-//void cpcFdam_getErrCode(hcpcFdam t, herrCode code)
-//{
-//    t->fifo->fout(t->fifo, code);
-//}
-void cpcFdam_run(hcpcFdam t)
+void cpcFmea_run(hcpcFmea t)
 {
-    t->errDisposeSm[t->errDisposeSmRec.next](&t->errDisposeSmRec);
+    SMRE(t->errDisposeSm, t->errDisposeSmRec);
 }
 
-CC(cpcFdam)
+CC(cpcFmea)
 {
-    cthis->init = cpcFdam_init;
-    cthis->saveErrCode = cpcFdam_saveErrCode;
-//    cthis->getErrCode = cpcFdam_getErrCode;
-    cthis->run = cpcFdam_run;
+    cthis->init = cpcFmea_init;
+    cthis->saveErrCode = cpcFmea_saveErrCode;
+    cthis->run = cpcFmea_run;
 
     cthis->errCnt = 0;
     cthis->errIgnoreCnt = 0;
@@ -186,14 +186,15 @@ CC(cpcFdam)
     cthis->errFeCnt = 0;
 
     cthis->errDisposeSmRec.next = errDisposeSm_sta_init;
-    cthis->errDisposeSm[errDisposeSm_sta_init] = errDisposeSm_act_init;
-    cthis->errDisposeSm[errDisposeSm_sta_polling] = errDisposeSm_act_polling;
-    cthis->errDisposeSm[errDisposeSm_sta_dispose] = errDisposeSm_act_dispose;
-    cthis->errDisposeSm[errDisposeSm_sta_default] = errDisposeSm_act_default;
+
+//    cthis->schParam.id = 0;
+//    cthis->schParam.schTask = cpcFmeaSch;
+//    cthis->schParam.startTick = (CPCFDAM_START_TICK_CFG / CASSCH_TIMER_PRD_CFG);
+//    cthis->schParam.prdTick = (CPCFDAM_PRD_TICK_CFG / CASSCH_TIMER_PRD_CFG);
 
     return cthis;
 }
-CD(cpcFdam)
+CD(cpcFmea)
 {
     return OOPC_TRUE;
 }
@@ -206,4 +207,4 @@ CD(cpcFdam)
 // --------------------------------------------------------------
 // 组件类实例化
 // --------------------------------------------------------------
-cpcFdam cpcFdamA;
+cpcFmea cpcFmeaA;
