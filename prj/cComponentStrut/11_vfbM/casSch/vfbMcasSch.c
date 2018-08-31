@@ -1,38 +1,42 @@
-/*
- * vfbMcasSch.c
- *
- *  Created on: 2018年8月18日
- *      Author: pxf
- */
+/**************************************************************************
+* @copyright    :Copyright(C), 2018, pxf, person.
+* @file         :vfbMcasSch.c
+* @author       :pxf
+* @version      :v1.0
+* @date         :2018/08/31 20:52:28
+* @brief        :组件casSch 管理类定义
+* @others       :
+* @history      :180831 pxf 初次建立
+***************************************************************************/
 
 #include "vfbMcasSch.h"
-#include "..\..\09_cpc\cpcFmea\cpcFmea.h"
+
+/*组件调度id临时配置，组件实际使用时必须在vbfMCfg.h中配置
+***********************************************************/
+#define casSch_id_priority_cfg   0
 
 
-// --------------------------------------------------------------
-// 管理组件初始化
-// --------------------------------------------------------------
-int16 vfbMcasSchInit(void)
-{
+/***********************************************************
+* 组件管理初始化
+***********************************************************/
+/*组件管理初始化
+* 输入: 无
+* 输出: int16 0-成功,-1-失败
+***********************************************/
+int16 vfbMcasSchInit(void){
     int16 rtv = 0;
 
-    CN(vfbMcasSch, &vfbMcasSchA, &vfbOcasSchA);
-    if (OPRS(vfbMcasSchA) != OOPC_NULL)
-    {
-        rtv = vfbIcpcFmeaInit();
-        if (rtv == 0)
-        {
-            vfbOcpcFmeaA.schParam.id = cpcFmea_id_priority_cfg;
-            vfbOcpcFmeaA.schParam.prdTick = (CPCFMEA_PRD_TICK_CFG / CASSCH_TIMER_PRD_CFG);
-            vfbOcpcFmeaA.schParam.startTick = (CPCFMEA_START_TICK_CFG / CASSCH_TIMER_PRD_CFG);
-            vfbIcasSchA.addTask(vfbIcasSchA.self,
-                    vfbOcpcFmeaA.schParam.id, vfbOcpcFmeaA.schParam.schTask,
-                    vfbOcpcFmeaA.schParam.prdTick, vfbOcpcFmeaA.schParam.startTick);
-        }
+    CN(vfbMcasSch, &vfbMcasSchA, &vfbOcasSchA, &vfbIcasSchA);
+    if(OPRS(vfbMcasSchA) != OOPC_NULL){
+//        vfbMcasSchA.vfbOcasSch->schParam.id = casSch_id_priority_cfg;
+//        vfbMcasSchA.vfbOcasSch->schParam.prdTick = (CASSCH_PRD_TICK_CFG / CASSCH_TIMER_PRD_CFG);
+//        vfbMcasSchA.vfbOcasSch->schParam.startTick = (CASSCH_PRD_TICK_CFG / CASSCH_TIMER_PRD_CFG);
+//        vfbMcasSchA.vfbIcasSch->addTask(vfbMcasSchA.vfbIcasSch,
+//            vfbMcasSchA.vfbOcasSch->schParam.id, vfbMcasSchA.vfbOcasSch->schParam.schTask,
+//            vfbMcasSchA.vfbOcasSch->schParam.prdTick, vfbMcasSchA.vfbOcasSch->schParam.startTick);
 
-    }
-    else
-    {
+        rtv = 0;
+    }else{
         rtv = -1;
     }
 
@@ -40,42 +44,72 @@ int16 vfbMcasSchInit(void)
 }
 
 
-// --------------------------------------------------------------
-// 组件管理类定义
-// --------------------------------------------------------------
-hvfbMcasSch hvfbMcasSch_init(hvfbMcasSch cthis, hvfbOcasSch vfbOcasSch)
-{
+/***********************************************************
+* 组件管理定义
+***********************************************************/
+/*组件管理类初始化函数
+* 输入: cthis vfbMcasSch类指针
+* 输出: hvfbMcasSch cthis/OOPC_NULL
+***********************************************/
+hvfbMcasSch vfbMcasSch_init(hvfbMcasSch cthis, hvfbOcasSch vfbOcasSch, hvfbIcasSch vfbIcasSch){
+    // 注入实例配置
     cthis->vfbOcasSch = vfbOcasSch;
-    return cthis;
-}
-
-void hvfbMcasSch_tickOut(hvfbMcasSch t)
-{}
-void hvfbMcasSch_err(hvfbMcasSch t, herrCode code)
-{}
-
-CC(vfbMcasSch)
-{
-    cthis->init = hvfbMcasSch_init;
-    cthis->tickOut = hvfbMcasSch_tickOut;
-    cthis->err = hvfbMcasSch_err;
+    cthis->vfbIcasSch = vfbIcasSch;
+    //TODO
 
     return cthis;
 }
-CD(vfbMcasSch)
-{
+
+/*hvfbMcasSch_tickOut 节拍输出
+* 输入: cthis vfbMcasSch类指针
+* 输出: 无
+***********************************************/
+void vfbMcasSch_tickOut(hvfbMcasSch t)
+{}
+
+/*hvfbMcasSch_err 错误输出
+* 输入: cthis vfbMcasSch类指针
+* 输出: 无
+***********************************************/
+void vfbMcasSch_err(hvfbMcasSch t, herrCode code)
+{}
+
+/*组件管理类构造函数
+* 输入: cthis vfbMcasSch类指针
+* 输出: hvfbMcasSch cthis/OOPC_NULL
+***********************************************/
+CC(vfbMcasSch){
+    // 功能函数配置
+    cthis->init = vfbMcasSch_init;
+    cthis->tickOut = vfbMcasSch_tickOut;
+    cthis->err = vfbMcasSch_err;
+
+    return cthis;
+}
+/*组件管理类析构函数
+* 输入: cthis vfbMcasSch类指针
+* 输出: OOPC_RETURN_DATATYPE OOPC_TRUE/OOPC_FALSE
+***********************************************/
+CD(vfbMcasSch){
     return OOPC_TRUE;
 }
 
-// --------------------------------------------------------------
-// 输出类接口定义
-// --------------------------------------------------------------
-void vfbMcasSch_vfbOcasSch_tickOut(hvfbOcasSch t)
-{}
-void vfbMcasSch_vfbOcasSch_err(hvfbOcasSch t, herrCode code)
-{}
 
-// --------------------------------------------------------------
-// 组件管理类实例
-// --------------------------------------------------------------
+/***********************************************************
+* 组件输出类接口定义
+***********************************************************/
+/*组件输出类功能函数
+***********************************************/
+void vfbMcasSch_vfbOcasSch_tickOut(hvfbOcasSch t){}
+void vfbMcasSch_vfbOcasSch_err(hvfbOcasSch t, herrCode code){}
+
+
+/***********************************************************
+* 组件管理实例化
+***********************************************************/
+/*组件管理类实例
+***********************************************/
 vfbMcasSch vfbMcasSchA;
+
+
+/**************************** Copyright(C) pxf ****************************/

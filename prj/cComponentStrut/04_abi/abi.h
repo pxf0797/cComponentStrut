@@ -23,7 +23,7 @@
 // 组件抽象接口包含
 // --------------------------------------------------------------
 #include ".\casSch\abicasSch.h"
-#include ".\csLedServ\abicsLedServ.h"
+//#include ".\csLedServ\abicsLedServ.h"
 
 // --------------------------------------------------------------
 // 组件初始化

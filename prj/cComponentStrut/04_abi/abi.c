@@ -22,8 +22,8 @@ int16 abiInit(void)
 {
     int16 rtv = 0;
 
-    rtv += abicasSchInit();
-    rtv += abicsLedServInit();
+    rtv |= abicasSchInit();
+//    rtv |= abicsLedServInit();
 
     return rtv;
 }
