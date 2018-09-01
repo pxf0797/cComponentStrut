@@ -1,13 +1,13 @@
-/*************************************************
- * Copyright © person
- * File name    : standType.h
- * Author       : pxf
- * Version      : v1.0
- * Created on   : 2018/8/16
- * Description  : 基本数据类型进行定义
- * Others       : 无
- * History      : 180816 pxf 初次建立
- ************************************************/
+/**************************************************************************
+* @copyright    :Copyright(C), 2018, pxf, person.
+* @file         :standType.h
+* @author       :pxf
+* @version      :v1.0
+* @date         :2018/09/01 14:40:50
+* @brief        :基本数据类型进行定义
+* @others       :
+* @history      :180901 pxf 初次建立
+***************************************************************************/
 
 #ifndef STANDTYPE_H_
 #define STANDTYPE_H_
@@ -40,3 +40,5 @@ typedef float                 float32;
 typedef double                float64;
 
 #endif /* STANDTYPE_H_ */
+
+/**************************** Copyright(C) pxf ****************************/

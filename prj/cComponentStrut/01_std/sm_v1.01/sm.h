@@ -54,8 +54,7 @@ typedef staAct *hstaAct, **hhstaAct;    // 状态机指针
     */
 #define SMDC(sm_type, sta_list)                                 \
 typedef struct sm_type##Rec *h##sm_type##Rec, sm_type##Rec;     \
-enum sm_type##_stas                                             \
-{                                                               \
+enum sm_type##_stas{                                            \
     sm_type##_sta_init = 0,                                     \
     sta_list(SD)                                                \
     sm_type##_sta_default                                       \
@@ -67,8 +66,7 @@ extern staAct sm_type[sm_type##_sta_default + 1];               \
 struct sm_type##Rec
 // state machine define 状态机定义
 #define SMDF(sm_type, sta_list)                                 \
-staAct sm_type[sm_type##_sta_default + 1] =                     \
-{                                                               \
+staAct sm_type[sm_type##_sta_default + 1] = {                   \
     sm_type##_act_init,                                         \
     sta_list(SADF)                                              \
     sm_type##_act_default                                       \
@@ -76,13 +74,14 @@ staAct sm_type[sm_type##_sta_default + 1] =                     \
 // state machine run 状态驱动，相对来说就是给时钟周期
 //static StaRec StaRunRec = {sm_type##_sta_init}; // 必须定义初始状态
 #define SMR(sm_type)                                            \
-do                                                              \
-{                                                               \
+do{                                                             \
     static sm_type##Rec sm_type##RunRec = {sm_type##_sta_init}; \
     sm_type[sm_type##RunRec.next](&sm_type##RunRec);            \
-} while (0)
+}while(0)
 // state machine run entity 使用状态机指针运行
 // 当前是在有状态机指针定义情况下，不使用SMR运行状态机
 #define SMRE(sm_entity_ptr, sm_rec)  (sm_entity_ptr)[(sm_rec).next](&(sm_rec))
 
 #endif /* SM_H_ */
+
+/**************************** Copyright(C) pxf ****************************/

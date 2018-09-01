@@ -27,7 +27,8 @@
  *                           2.增加宏版本定义，当前版本为v1.01
  *                180816 pxf 1.因使用频率特别低，使用代码直接替代更加方便，删除宏FS
  *                           2.增加依赖注入宏INJ，使得实类可注入一个类多个实例
- *                           3.版本升级v1.02
+ *                           3.CN/CCC增加在传递不可变参数时，使用宏定义参数进行传递
+ *                           4.版本升级v1.02
  ************************************************/
 
 #ifndef OOPC_H_
@@ -45,6 +46,7 @@
 // 配置选项---------------------------------------------------------------------
 #define OOPC_USE_USER_DEFINED_OFFSETOF  OOPC_TRUE   // 是否使用用户定义的OOPC_OFFSETOF，OOPC_FALSE时使用C标准库中的offsetof
 #define OOPC_USE_STATIC_INLINE_OPTIMIZE OOPC_TRUE   // 是否使用static inline对构造及析构函数代码调用进行优化
+#define OOPC_CN_CCC_SUPPORT_FLEXIABLE_PARAM OOPC_TRUE // 是否支持可变参数对类进行实例化
 #define OOPC_RETURN_DATATYPE            int         // 定义析构函数等返回数据类型
 
 // 配置选择---------------------------------------------------------------------
@@ -128,15 +130,15 @@ OOPC_STATIC_INLINE h##type type##_ctor(h##type cthis);               \
 h##type type##_new(void *self){                                      \
     h##type cthis = (h##type)self;                                   \
     h##type Rtv = OOPC_NULL;                                         \
-    if (OOPC_NULL != cthis){                                         \
+    if(OOPC_NULL != cthis){                                          \
         cthis->self = cthis;                                         \
-        if (OOPC_NULL == type##_ctor(cthis)){                        \
+        if(OOPC_NULL == type##_ctor(cthis)){                         \
             cthis->self = OOPC_NULL;                                 \
             Rtv = OOPC_NULL;                                         \
-        } else {                                                     \
+        }else{                                                       \
             Rtv = cthis;                                             \
         }                                                            \
-    } else {                                                         \
+    }else{                                                           \
     	Rtv = OOPC_NULL;                                             \
     }                                                                \
     return Rtv;                                                      \
@@ -148,14 +150,14 @@ OOPC_STATIC_INLINE h##type type##_ctor(h##type cthis)
 OOPC_STATIC_INLINE OOPC_RETURN_DATATYPE type##_dtor(h##type cthis);  \
 OOPC_RETURN_DATATYPE type##_delete(h##type cthis){                   \
 	OOPC_RETURN_DATATYPE Rtv = OOPC_FALSE;                           \
-	if (OOPC_NULL != cthis){                                         \
+	if(OOPC_NULL != cthis){                                          \
 		cthis->self = OOPC_NULL;                                     \
-	    if (OOPC_TRUE == type##_dtor(cthis)){                        \
+	    if(OOPC_TRUE == type##_dtor(cthis)){                         \
             Rtv = OOPC_TRUE;                                         \
-        } else {                                                     \
+        }else{                                                       \
             Rtv = OOPC_FALSE;                                        \
         }                                                            \
-	} else {                                                         \
+	}else{                                                           \
 		Rtv = OOPC_FALSE;                                            \
 	}                                                                \
 	return Rtv;                                                      \
@@ -171,25 +173,46 @@ OOPC_STATIC_INLINE OOPC_RETURN_DATATYPE type##_dtor(h##type cthis)
 // 调用抽象类析构函数call abstract class destructor，有返回值OOPC_TRUE/OOPC_FALSE
 #define CACD(father)                    father##_dtor(&(cthis->father))
 // 调用类构造函数call class constructor，有返回值cthis/OOPC_NULL
+#if (OOPC_CN_CCC_SUPPORT_FLEXIABLE_PARAM == OOPC_TRUE)
 #define CCC(father, fatherptr, ...)                                  \
-do                                                                   \
-{                                                                    \
+do{                                                                  \
     cthis->father = father##_new((void *)(fatherptr));               \
-    if (OOPC_NULL != cthis->father){                                 \
-        if (OOPC_NULL == cthis->father->init(cthis->father, __VA_ARGS__)){ \
-        	if (OOPC_TRUE == father##_delete(cthis->father)){        \
+    if(OOPC_NULL != cthis->father){                                  \
+        if(OOPC_NULL == cthis->father->init(cthis->father, __VA_ARGS__)){ \
+        	if(OOPC_TRUE == father##_delete(cthis->father)){         \
         		;                                                    \
-        	} else {                                                 \
+        	}else{                                                   \
         		;                                                    \
         	}                                                        \
         	cthis->father = OOPC_NULL;                               \
-        } else {                                                     \
+        }else{                                                       \
         	;                                                        \
         }                                                            \
-    } else {                                                         \
+    }else{                                                           \
     	;                                                            \
     }                                                                \
-} while (0)
+}while(0)
+#else
+//#define ccc_param  param1,param2...
+#define CCC(father, fatherptr, param)                                \
+do{                                                                  \
+    cthis->father = father##_new((void *)(fatherptr));               \
+    if(OOPC_NULL != cthis->father){                                  \
+        if(OOPC_NULL == cthis->father->init(cthis->father, param)){  \
+            if(OOPC_TRUE == father##_delete(cthis->father)){         \
+                ;                                                    \
+            }else{                                                   \
+                ;                                                    \
+            }                                                        \
+            cthis->father = OOPC_NULL;                               \
+        }else{                                                       \
+            ;                                                        \
+        }                                                            \
+    }else{                                                           \
+        ;                                                            \
+    }                                                                \
+}while(0)
+#endif
 // 调用类析构函数call class destructor，有返回值OOPC_TRUE/OOPC_FALSE
 #define CCD(father)                     father##_delete((cthis->father))
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -197,57 +220,76 @@ do                                                                   \
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 // 实类实例化及释放Class New/Free，参数个数任意----------------------------------
 // CF多个参数是类实例化通过init函数进行配置的参数传递决定的
+#if (OOPC_CN_CCC_SUPPORT_FLEXIABLE_PARAM == OOPC_TRUE)
 #define CN(type, classptr, ...)                                      \
-do                                                                   \
-{                                                                    \
-    if (OOPC_NULL != type##_new((void *)(classptr))){                \
-		if (OOPC_NULL == (classptr)->init((classptr), __VA_ARGS__)){ \
-        	if (OOPC_TRUE == type##_delete(classptr)){               \
+do{                                                                  \
+    if(OOPC_NULL != type##_new((void *)(classptr))){                 \
+		if(OOPC_NULL == (classptr)->init((classptr), __VA_ARGS__)){  \
+        	if(OOPC_TRUE == type##_delete(classptr)){                \
         		;                                                    \
-        	} else {                                                 \
+        	}else{                                                   \
         		;                                                    \
         	}                                                        \
-        } else {                                                     \
+        }else{                                                       \
         	;                                                        \
         }                                                            \
-    } else {                                                         \
+    }else{                                                           \
         ;                                                            \
     }                                                                \
-} while (0)
+}while(0)
+#else
+//#define cn_param  param1,param2...
+#define CN(type, classptr, param)                                    \
+do{                                                                  \
+    if(OOPC_NULL != type##_new((void *)(classptr))){                 \
+        if(OOPC_NULL == (classptr)->init((classptr), param)){        \
+            if(OOPC_TRUE == type##_delete(classptr)){                \
+                ;                                                    \
+            }else{                                                   \
+                ;                                                    \
+            }                                                        \
+        }else{                                                       \
+            ;                                                        \
+        }                                                            \
+    }else{                                                           \
+        ;                                                            \
+    }                                                                \
+}while(0)
+#endif
 // Class New Without(No) Param无参类实例化
 #define CNNP(type, classptr)                                         \
-do                                                                   \
-{                                                                    \
-    if (OOPC_NULL != type##_new((void *)(classptr))){                \
-		if (OOPC_NULL == (classptr)->init(classptr)){                \
-        	if (OOPC_TRUE == type##_delete(classptr)){               \
+do{                                                                  \
+    if(OOPC_NULL != type##_new((void *)(classptr))){                 \
+		if(OOPC_NULL == (classptr)->init(classptr)){                 \
+        	if(OOPC_TRUE == type##_delete(classptr)){                \
         		;                                                    \
-        	} else {                                                 \
+        	}else{                                                   \
         		;                                                    \
         	}                                                        \
-        } else {                                                     \
+        }else{                                                       \
         	;                                                        \
         }                                                            \
-    } else {                                                         \
+    }else{                                                           \
         ;                                                            \
     }                                                                \
-} while (0)
+}while(0)
 // ClassFree对类资源进行释放
 #define CF(type, classptr)                                           \
-do                                                                   \
-{                                                                    \
-	if (OOPC_NULL != (classptr)){                                    \
-		if (OOPC_TRUE == type##_delete(classptr)){                   \
+do{                                                                  \
+	if(OOPC_NULL != (classptr)){                                     \
+		if(OOPC_TRUE == type##_delete(classptr)){                    \
             ;                                                        \
-        } else {                                                     \
+        }else{                                                       \
         	;                                                        \
         }                                                            \
-	} else {                                                         \
+	}else{                                                           \
 		;                                                            \
 	}                                                                \
-} while (0)
+}while(0)
 // 由于CN/CNNP/CF/CCC调用后没有返回值，通过以下宏查看操作结果operation result，self/OOPC_NULL
 #define OPRS(class)                     (class).self
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 #endif /* OOPC_H_ */
+
+/**************************** Copyright(C) pxf ****************************/

@@ -3,17 +3,17 @@
 * @file         :vfbMcsLedServ.c
 * @author       :pxf
 * @version      :v1.0
-* @date         :2018/08/31 23:21:10
+* @date         :2018/09/01 14:40:50
 * @brief        :组件csLedServ 管理类定义
 * @others       :
-* @history      :180831 pxf 初次建立
+* @history      :180901 pxf 初次建立
 ***************************************************************************/
 
 #include "vfbMcsLedServ.h"
 
 /*组件调度id临时配置，组件实际使用时必须在vbfMCfg.h中配置
 ***********************************************************/
-#define csLedServ_id_priority_cfg   0
+//#define csLedServ_id_priority_cfg   0
 
 
 /***********************************************************

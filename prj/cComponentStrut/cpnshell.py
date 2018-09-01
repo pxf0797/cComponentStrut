@@ -11,7 +11,7 @@ class cpnShell:
     __timeFormatFull = datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S')
     __timeFormatShort = datetime.datetime.now().strftime('%y%m%d')
     
-    __encoding = 'gb2312' #'utf-8' 'gb2312' ''
+    __encoding = 'gb2312' #'utf-8' 'gb2312' 'gbk'
     
     __cpnType = ' '
     __cpnName = ' '
@@ -25,16 +25,14 @@ class cpnShell:
         '@date':':'+__timeFormatFull,
         '@brief':':',
         '@others':':',
-        '@history':':'+__timeFormatShort+' pxf 初次建立',
-    }
+        '@history':':'+__timeFormatShort+' pxf 初次建立'}
     __functionComments = {'@function':':',
         '@description':':',
         '@input':':',
         '@output':':',
         '@calls':':',
         '@calledBy':':',
-        '@others':':',
-    }
+        '@others':':'}
 
     __fCommentsOrder = ('@copyright','@file','@author','@version','@date','@brief','@others','@history')
     __funcCommentsOrder = ('@function','@description','@input','@output','@calls','@calledBy','@others')
@@ -49,8 +47,7 @@ class cpnShell:
         'cuf':'08',
         'cpc':'09',
         'ccc':'10',
-        'vfbM':'11',
-    }
+        'vfbM':'11'}
     __cpnFolder = {'std':' ',
         'bm':' ',
         'bsp':' ',
@@ -61,8 +58,7 @@ class cpnShell:
         'cuf':' ',
         'cpc':' ',
         'ccc':' ',
-        'vfbM':' ',
-    }
+        'vfbM':' '}
     __cpnConstructorCommand = {'std':' ',
         'bm':' ',
         'bsp':' ',
@@ -73,13 +69,13 @@ class cpnShell:
         'cuf':' ',
         'cpc':' ',
         'ccc':' ',
-        'vfbM':' ',
-    }
+        'vfbM':' '}
 
     def __init__(self,cpnType,cpnName):
         """根据输入参数初始化参数
         
-        主要功能：1.生成文件名称"""
+        主要功能：1.生成文件名称
+                  2.配置可生成文件文件夹"""
         self.__cpnType = cpnType
         self.__cpnName = cpnName
         if(self.__cpnType == 'cas'):
@@ -132,56 +128,55 @@ class cpnShell:
             __cpnTypeCorrect = 0
             sys.stderr.write("cpnType parameter err, please input corret parameter\n")
 
+            
     # ======================================================
     # 文件内具体代码生成函数
     # ======================================================
+
+    # ------------------------------------------------------
+    # 通用文件内注释
     def generateFileHeadComment(self,name):
+        """根据输入名称生成头文件文件头注释"""
         # set filename for every file generate
         self.__fileComments['@file'] = ':'+name
 
         comments = ('/**************************************************************************\n')
-
         # find max length of string
         maxLen = 0
         for s in self.__fCommentsOrder:
             if(len(s) > maxLen):
                 maxLen = len(s)
-                
         # align space generate line
         for k in self.__fCommentsOrder:
             alignSpaceAmount = maxLen - len(k) + 4
             alignSpace = alignSpaceAmount * ' '
             comments += ('* '+ k + alignSpace + self.__fileComments[k] + '\n')
-
         comments += ('***************************************************************************/\n\n')
-
         return comments
-
     def generateFileEndComment(self):
+        """根据生成文件结束注释"""
         return ("/**************************** Copyright(C) pxf ****************************/\n")
-        
+    # 根据输入名称生成函数注释
     def generateFunctionComment(self,name):
+        """根据输入名称生成函数注释"""
         # set function name for every function generate
         self.__functionComments['@function'] = ':'+name
 
         comments = ('/***********************************************************\n')
-
         # find max length of string
         maxLen = 0
         for s in self.__funcCommentsOrder:
             if(len(s) > maxLen):
                 maxLen = len(s)
-                
         # align space generate line
         for k in self.__funcCommentsOrder:
             alignSpaceAmount = maxLen - len(k) + 4
             alignSpace = alignSpaceAmount * ' '
             comments += ('* '+ k + alignSpace + self.__functionComments[k] + '\n')
-
         comments += ('***********************************************************/\n')
-
         return comments
-        
+    
+    # 类初始化函数注释
     def cpnHeaerAndSourceClassInitFuncComment(self,name,functype,brief):
         '''类初始化函数注释'''
         comments = ('/*'+brief+'\n')
@@ -191,15 +186,18 @@ class cpnShell:
         comments += ('h%s %s_init%s\n' %(name,name,functype))
         comments += ('\n'*1)
         return comments
+    # 类初功能函数注释
     def cpnHeaerAndSourceClassFuncComment(self,name,funcname,functype,brief):
-        '''类初始化函数注释'''
+        '''类初功能函数注释'''
         comments = ('/*'+brief+'\n')
         comments += ('* 输入: t %s类指针\n' %name)
         comments += ('* 输出: 无\n')
         comments += ('***********************************************/\n')
         comments += ('void %s_%s%s\n' %(name,funcname,functype))
         comments += ('\n'*1)
-        return comments    
+        return comments 
+    
+    # 构造函数注释
     def cpnHeaerAndSourceCCFuncComment(self,name,functype,brief):
         '''构造函数注释'''
         comments = ('/*'+brief+'\n')
@@ -209,6 +207,7 @@ class cpnShell:
         comments += ('CC%s\n' %functype)
         #comments += ('\n'*1)
         return comments
+    # 析构函数注释
     def cpnHeaerAndSourceCDFuncComment(self,name,functype,brief):
         '''析构函数注释'''
         comments = ('/*'+brief+'\n')
@@ -218,6 +217,8 @@ class cpnShell:
         comments += ('CD%s\n' %functype)
         comments += ('\n'*1)
         return comments
+    
+    # 状态机状态处理函数注释
     def cpnHeaerAndSourceSMFuncComment(self,name,sta,functype,brief):
         '''状态机状态处理函数注释'''
         comments = ('/*'+brief+'\n')
@@ -227,6 +228,8 @@ class cpnShell:
         comments += ('void sm%s_act_%s%s\n' %(name,sta,functype))
         comments += ('\n'*1)
         return comments
+        
+    # 组件初始化相关函数注释
     def cpnHeaerAndSourceInitFuncComment(self,ext,name,functype,brief):
         '''组件初始化相关函数注释'''
         comments = ('/*'+brief+'\n')
@@ -236,6 +239,7 @@ class cpnShell:
         comments += (ext+'int16 %sInit%s\n' %(name,functype))
         comments += ('\n'*1)
         return comments
+    # 任务调度函数注释
     def cpnHeaerAndSourceSchFuncComment(self,ext,name,functype,brief):
         '''任务调度函数注释'''
         comments = ('/*'+brief+'\n')
@@ -245,24 +249,7 @@ class cpnShell:
         comments += (ext+'void %sSch%s\n' %(name,functype))
         comments += ('\n'*1)
         return comments
-    def cpnHeaerInitFuncComment(self,name,ext,brief):
-        '''组件初始化相关函数注释'''
-        comments = ('/*'+brief+'\n')
-        comments += ('* 输入: 无\n')
-        comments += ('* 输出: int16 0-成功,-1-失败\n')
-        comments += ('***********************************************/\n')
-        comments += (ext+'int16 %sInit(void);\n' %name)
-        comments += ('\n'*1)
-        return comments
-    def cpnHeaerSchFuncComment(self,name,ext,brief):
-        '''任务调度函数注释'''
-        comments = ('/*'+brief+'\n')
-        comments += ('* 输入: 无\n')
-        comments += ('* 输出: 无\n')
-        comments += ('***********************************************/\n')
-        comments += (ext+'void %sSch(void);\n' %name)
-        comments += ('\n'*1)
-        return comments    
+    # 组件初始化及调度注释
     def cpnHeaderGenerateCpnInitAndSchComment(self,name):
         '''组件初始化及调度注释'''
         comments = ('/***********************************************************\n')
@@ -279,7 +266,11 @@ class cpnShell:
         comments += self.cpnHeaerAndSourceSchFuncComment('',name,'(void);','组件进行调度')
         comments += ('\n'*1)
         return comments
-        
+    # ------------------------------------------------------
+    
+    # ------------------------------------------------------
+    # 头文件文件内注释
+    # 组件输出类注释
     def cpnHeaderGenerateVfbOcpnComment(self,name):
         '''组件输出类注释'''
         comments = ('/***********************************************************\n')
@@ -305,7 +296,7 @@ class cpnShell:
         comments += ('extern vfbO%s vfbO%sA;\n' %(name,name))
         comments += ('\n'*1)
         return comments
-        
+    # 组件类注释
     def cpnHeaderGenerateCpnComment(self,name):
         '''组件类注释'''
         comments = ('/***********************************************************\n')
@@ -318,9 +309,9 @@ class cpnShell:
         comments += ('#define SM_%s_STA_LIST(_) \\\n' %name.upper())
         comments += ('    _(sm%s, sta1)\\\n    _(sm%s, sta2)\n' %(name,name))
         comments += ('\n'*1)
-        comments += ('/*组件状态机定义\n')
+        comments += ('/*组件状态机声明\n')
         comments += ('***********************************************/\n')
-        comments += ('SMDC(sm%s, SM_%s_STA_LIST)\n{\n' %(name,name.upper()))
+        comments += ('SMDC(sm%s, SM_%s_STA_LIST){\n' %(name,name.upper()))
         comments += ('    sta next;\n    //TODO\n')
         comments += ('\n'*1)
         comments += ('    // 注入组件类\n    void *%s;\n};\n' %name)
@@ -353,7 +344,7 @@ class cpnShell:
         comments += ('extern %s %sA;\n' %(name,name))
         comments += ('\n'*1)
         return comments
-        
+    # 组件输入类注释
     def cpnHeaderGenerateVfbIcpnComment(self,name):
         '''组件输入类注释'''
         comments = ('/***********************************************************\n')
@@ -373,7 +364,7 @@ class cpnShell:
         comments += ('extern vfbI%s vfbI%sA;\n' %(name,name))
         comments += ('\n'*1)
         return comments
-    
+    # 组件管理类注释
     def cpnHeaderGenerateVfbMcpnComment(self,name):
         '''组件管理类注释'''
         comments = ('/***********************************************************\n')
@@ -399,7 +390,11 @@ class cpnShell:
         comments += ('extern vfbM%s vfbM%sA;\n' %(name,name))
         comments += ('\n'*1)
         return comments
+    # ------------------------------------------------------
     
+    # ------------------------------------------------------
+    # 源文件文件内注释
+    # 组件输入定义
     def cpnSourceInitFuncEntity(self,initName,outName,injSource):
         funcEntity = ("(void){\n")
         funcEntity += ("    int16 rtv = 0;\n\n")
@@ -445,7 +440,7 @@ class cpnShell:
         comments += ('vfbI%s vfbI%sA;\n' %(name,name))
         comments += ('\n'*1)
         return comments
-        
+    # 组件定义
     def cpnSourceGenerateCpnInitAndSchComment(self,name):
         '''组件初始化及调度注释'''
         comments = ('/***********************************************************\n')
@@ -504,7 +499,7 @@ class cpnShell:
         comments += ('%s %sA;\n' %(name,name))
         comments += ('\n'*1)
         return comments
-    
+    # 组件输出定义
     def cpnSourceInitFuncEntityNoInj(self,initName,outName):
         funcEntity = ("(void){\n")
         funcEntity += ("    int16 rtv = 0;\n\n")
@@ -514,7 +509,7 @@ class cpnShell:
         funcEntity += ("\n    return rtv;\n}")
         return funcEntity
     def cpnSourceGenerateVfbOcpnComment(self,name):
-        '''组件输入定义'''
+        '''组件输出定义'''
         comments = ('/***********************************************************\n')
         comments += ('* 组件输出初始化\n')
         comments += ('***********************************************************/\n')
@@ -553,7 +548,7 @@ class cpnShell:
         comments += ('vfbO%s vfbO%sA;\n' %(name,name))
         comments += ('\n'*1)
         return comments
-    
+    # 组件管理定义
     def cpnSourcevfbMInitFuncEntity(self,name):
         funcEntity = ("(void){\n")
         funcEntity += ("    int16 rtv = 0;\n\n")
@@ -569,7 +564,7 @@ class cpnShell:
         funcEntity += ("\n    return rtv;\n}")
         return funcEntity
     def cpnSourceGenerateVfbMcpnComment(self,name):
-        '''组件输入定义'''
+        '''组件管理定义'''
         comments = ('/*组件调度id临时配置，组件实际使用时必须在vbfMCfg.h中配置\n')
         comments += ('***********************************************************/\n')
         comments += ('#define %s_id_priority_cfg   0\n' %name)
@@ -617,7 +612,7 @@ class cpnShell:
         comments += ('vfbM%s vfbM%sA;\n' %(name,name))
         comments += ('\n'*1)
         return comments
-    
+    # 组件抽象接口定义
     def cpnSourceAbiInitCNEntity(self,abiClass,abiObj,injSource):
         cnEntity = ("    //CN(%s, &%s, %s);\n" %(abiClass,abiObj,injSource))
         cnEntity += ("    //if(OPRS(%s) == OOPC_NULL){\n" %abiObj)
@@ -629,13 +624,16 @@ class cpnShell:
         funcEntity += ("%s" %injSource)
         funcEntity += ("\n    return rtv;\n}")
         return funcEntity
+    # ------------------------------------------------------
     # ======================================================
 
     
     # ======================================================
     # 具体文件生成函数
     # ======================================================
+    # 生成源文件
     def createSource(self,name):
+        '''生成源文件'''
         fh = open(name+'.c',mode = 'w',encoding=self.__encoding)
         cm = self.generateFileHeadComment(name+'.c')
         cm += ("#include \"%s.h\"\n" %name) 
@@ -646,8 +644,9 @@ class cpnShell:
         cm += self.generateFileEndComment()
         fh.write(cm)
         fh.close()
-
+    # 生成源文件
     def createHeader(self,name):
+        '''生成头文件'''
         fh = open(name+'.h',mode = 'w',encoding=self.__encoding)
         cm = self.generateFileHeadComment(name+'.h')
         cm += "#ifndef %s_H_\n" %name.upper()
@@ -656,11 +655,11 @@ class cpnShell:
         cm += self.generateFunctionComment(name+'()')
         cm += ("void %s(void);\n" %name)
         cm += ("\n"*2)
-        cm += "#endif\n\n"
+        cm += "#endif /* %s_H_ */\n\n" %name.upper()
         cm += self.generateFileEndComment()
         fh.write(cm)
         fh.close()
-        
+    # 组件模块头文件
     def createCpnHeader(self,name):
         """组件模块头文件
         
@@ -692,11 +691,11 @@ class cpnShell:
         cm += ("\n"*1)
         cm += self.cpnHeaderGenerateVfbIcpnComment(name)
         cm += ("\n"*1)
-        cm += "#endif\n\n"
+        cm += "#endif /* %s_H_ */\n\n" %name.upper()
         cm += self.generateFileEndComment()
         fh.write(cm)
         fh.close()
-        
+    # 组件模块配置文件
     def createcpnCfgHeader(self,name):
         """组件模块配置文件
         
@@ -714,11 +713,11 @@ class cpnShell:
         cm += ("#define %s_PRD_TICK_CFG        10000000.0L    // 任务调度周期配置(ns),10ms\n"  %name.upper())
         cm += ("#define %s_START_TICK_CFG      3000000.0L     // 任务调度启动配置(ns),3ms\n"  %name.upper())
         cm += ("\n"*1)
-        cm += "#endif\n\n"
+        cm += "#endif /* %sCFG_H_ */\n\n" %name.upper()
         cm += self.generateFileEndComment()
         fh.write(cm)
         fh.close()
-    
+    # 组件模块错误码文件
     def createcpnErrCodeHeader(self,name):
         """组件模块错误码文件
         
@@ -762,11 +761,11 @@ class cpnShell:
         cm += ("#define %s_part2_err1%s0%s// EC_EC_cie       EC_ER_warning  // 组件部件1错误1\n" %(name,errspace,errspace2))
         cm += ('/**********************************************************************************************************************/\n')
         cm += ("\n"*1)
-        cm += "#endif\n\n"
+        cm += "#endif /* %sERRCODE_H_ */\n\n" %name.upper()
         cm += self.generateFileEndComment()
         fh.write(cm)
         fh.close()
-    
+    # 组件输入类源文件
     def createVfbIcpnSource(self,name):
         """组件输入类源文件
         
@@ -782,7 +781,7 @@ class cpnShell:
         cm += self.generateFileEndComment()
         fh.write(cm)
         fh.close()
-        
+    # 组件类源文件
     def createCpnSource(self,name):
         """组件类源文件
         
@@ -825,7 +824,7 @@ class cpnShell:
         cm += self.generateFileEndComment()
         fh.write(cm)
         fh.close()
-    
+    # 组件输出类源文件
     def createVfbOcpnSource(self,name):
         """组件输出类源文件
         
@@ -841,7 +840,7 @@ class cpnShell:
         cm += self.generateFileEndComment()
         fh.write(cm)
         fh.close()
-    
+    # 组件管理模块头文件
     def createVfbMCpnHeader(self,name):
         """组件管理模块头文件
         
@@ -865,13 +864,13 @@ class cpnShell:
         cm += ('\n'*1)
         cm += self.cpnHeaderGenerateVfbMcpnComment(name)
         cm += ("\n"*1)
-        cm += "#endif\n\n"
+        cm += "#endif /* VFBM%s_H_ */\n\n" %name.upper()
         cm += self.generateFileEndComment()
         fh.write(cm)
         fh.close()
-        
+    # 组件管理类源文件
     def createVfbMcpnSource(self,name):
-        """组件输入类源文件
+        """组件管理类源文件
         
         生成组件输入类实现方式"""
         fh = open('vfbM'+name+'.c',mode = 'w',encoding=self.__encoding)
@@ -885,7 +884,7 @@ class cpnShell:
         cm += self.generateFileEndComment()
         fh.write(cm)
         fh.close()
-    
+    # 组件抽象接口头文件
     def createAbiCpnHeader(self,name):
         """组件抽象接口头文件
         
@@ -934,11 +933,11 @@ class cpnShell:
         cm += ('***********************************************/\n')
         cm += ('//extern go led;\n')
         cm += ('\n'*2)
-        cm += "#endif\n\n"
+        cm += "#endif /* ABI%s_H_ */\n\n" %name.upper()
         cm += self.generateFileEndComment()
         fh.write(cm)
         fh.close()
-        
+    # 组件抽象接口源文件
     def createAbicpnSource(self,name):
         """组件抽象接口源文件
         
@@ -985,20 +984,16 @@ class cpnShell:
         fh.write(cm)
         fh.close()
     # ======================================================
-    
-    #def createTemplatePairs(self):
-    #    self.createSource()
-    #    self.createHeader()
-
         
         
     # ======================================================
     # 文件生成控制函数
     # ======================================================
+    # 默认命令
     def cpnGenDefaultFunc(self):
         '''默认命令'''
         sys.stderr.write("component generate use default function\n")
-    
+    # 初始化控制命令
     def cpnConstructorCommandInit(self):
         '''初始化控制命令'''
         self.__cpnConstructorCommand['std'] = self.bspcpnGenFunc
@@ -1012,7 +1007,7 @@ class cpnShell:
         self.__cpnConstructorCommand['cpc'] = self.bspcpnGenFunc
         self.__cpnConstructorCommand['ccc'] = self.bspcpnGenFunc
         self.__cpnConstructorCommand['vfbM'] = self.bspcpnGenFunc
-    
+    # 对组件所有需要的文件进行判断是否存在
     def cpnFolderExistJudgeAndCreat(self):
         """对组件所有需要的文件进行判断是否存在
         
@@ -1031,24 +1026,27 @@ class cpnShell:
                     os.chdir('..')
                 else:
                     os.makedirs(self.__cpnTypeIndex[cpnIndex]+'_'+cpnIndex+'\\'+self.__cpnFolder[cpnIndex])
-
+    # bsp层对应文件生成
     def bspcpnGenFunc(self):
+        '''bsp层对应文件生成'''
         if(self.__cpnFolderExist == 0)and(self.__cpnFolder['bsp'] != ' '):
             os.chdir(self.__cpnTypeIndex['bsp']+'_bsp\\'+self.__cpnFolder['bsp'])
             self.createSource('bsp'+self.__cpnType+self.__cpnName)
             self.createHeader('bsp'+self.__cpnType+self.__cpnName)
             os.chdir('..')
             os.chdir('..')
-            
+    # abi层对应文件生成        
     def abicpnGenFunc(self):
+        '''abi层对应文件生成'''
         if(self.__cpnFolderExist == 0)and(self.__cpnFolder['abi'] != ' '):
             os.chdir(self.__cpnTypeIndex['abi']+'_abi\\'+self.__cpnFolder['abi'])
             self.createAbiCpnHeader(self.__cpnType+self.__cpnName)
             self.createAbicpnSource(self.__cpnType+self.__cpnName)
             os.chdir('..')
             os.chdir('..')    
-    
+    # 组件层对应文件生成   
     def cpnGenFunc(self):
+        '''组件层对应文件生成'''
         if(self.__cpnFolderExist == 0)and(self.__cpnFolder[self.__cpnType] != ' '):
             os.chdir(self.__cpnTypeIndex[self.__cpnType]+'_'+self.__cpnType+'\\'+self.__cpnFolder[self.__cpnType])
             self.createCpnHeader(self.__cpnType+self.__cpnName)
@@ -1059,8 +1057,9 @@ class cpnShell:
             self.createVfbOcpnSource(self.__cpnType+self.__cpnName)
             os.chdir('..')
             os.chdir('..')
-
+    # 组件vfbM层对应文件生成  
     def vfbMcpnGenFunc(self):
+        '''组件vfbM层对应文件生成'''
         if(self.__cpnFolderExist == 0)and(self.__cpnFolder['vfbM'] != ' '):
             os.chdir(self.__cpnTypeIndex['vfbM']+'_vfbM\\'+self.__cpnFolder['vfbM'])
             self.createVfbMCpnHeader(self.__cpnType+self.__cpnName)
@@ -1068,14 +1067,18 @@ class cpnShell:
             os.chdir('..')
             os.chdir('..')
     # ======================================================
-        
-        
+    
+    
+    # ======================================================
+    # 模板生成
+    # ======================================================    
     def createTemp(self):    
+        '''模板生成功能函数'''
         self.cpnFolderExistJudgeAndCreat()
         for cpnIndex in self.__cpnFolder:
             if(self.__cpnFolder[cpnIndex] != ' '):
                 self.__cpnConstructorCommand[cpnIndex]()
-        
+    # ======================================================    
         
 if __name__ == '__main__':
     if len(sys.argv) != 3:

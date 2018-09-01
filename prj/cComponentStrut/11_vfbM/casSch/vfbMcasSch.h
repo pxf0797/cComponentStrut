@@ -14,7 +14,6 @@
 
 #include "..\..\01_std\std.h"
 #include "..\..\06_cas\casSch\casSch.h"
-//#include "..\..\06_cas\casSch\casSch.h"
 #include "..\vfbMCfg.h"
 
 /***********************************************************
@@ -56,6 +55,6 @@ void vfbMcasSch_vfbOcasSch_err(hvfbOcasSch t, herrCode code);
 extern vfbMcasSch vfbMcasSchA;
 
 
-#endif
+#endif /* VFBMCASSCH_H_ */
 
 /**************************** Copyright(C) pxf ****************************/

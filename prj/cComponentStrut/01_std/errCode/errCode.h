@@ -1,16 +1,20 @@
-/*
- * errCode.h
- *
- *  Created on: 2018年8月18日
- *      Author: pxf
- */
+/**************************************************************************
+* @copyright    :Copyright(C), 2018, pxf, person.
+* @file         :errCode.h
+* @author       :pxf
+* @version      :v1.0
+* @date         :2018/09/01 14:40:50
+* @brief        :错误类型基准数据定义
+* @others       :
+* @history      :180901 pxf 初次建立
+***************************************************************************/
 
 #ifndef ERRCODE_H_
 #define ERRCODE_H_
 
-// 通用错误码
-typedef struct
-{
+/*通用错误码
+***********************************************/
+typedef struct{
     void *id;                     // 由组件实例化时实现
     struct
     {
@@ -21,33 +25,24 @@ typedef struct
     };
 } errCode, *herrCode;
 
-// id
+/*errClassify
+***********************************************************/
+#define EC_EC_cie      0 // communicationInputErr   通信输入错误
+#define EC_EC_coe      1 // communicationOutputErr  通信输出错误
+#define EC_EC_se       2 // schedularErr            任务调度错误
+#define EC_EC_fe       3 // functionErr             功能错误
+/**********************************************************/
 
-// cpnPartId
+/*errRanking
+***********************************************************/
+#define EC_ER_ignore   0 // ignore   可忽略
+#define EC_ER_warning  1 // warning  警告
+#define EC_ER_serious  2 // serious  严重错误
+#define EC_ER_fatal    3 // fatal    致命错误
+/**********************************************************/
 
-// errClassify
-// 0  communicationInputErr  通信输入错误
-// 1  communicationOutputErr 通信输出错误
-// 2  schedularErr           任务调度错误
-// 3  functionErr            功能错误
-#define EC_EC_cie            0 // communicationInputErr
-#define EC_EC_coe            1 // communicationOutputErr
-#define EC_EC_se             2 // schedularErr
-#define EC_EC_fe             3 // functionErr
-
-// errRanking
-// 0  ignore    可忽视
-// 1  warning   警告
-// 2  serious   严重错误
-// 3  fatal     致命错误
-#define EC_ER_ignore         0 // ignore
-#define EC_ER_warning        1 // warning
-#define EC_ER_serious        2 // serious
-#define EC_ER_fatal          3 // fatal
-
-// errCode
-
-
+/*errCode
+***********************************************************/
 #define EC32(cpnPartId, errClassify, errRanking, errCode)       (((cpnPartId) << 24) | ((errClassify) << 20) | ((errRanking) << 16) | (errRanking))
 #define EC_PID(errcode)                                         (((errcode) & 0xFF000000) >> 24)
 #define EC_ECF(errcode)                                         (((errcode) & 0x00F00000) >> 20)
@@ -55,3 +50,5 @@ typedef struct
 #define EC_EC(errcode)                                          (((errcode) & 0x0000FFFF) >> 0)
 
 #endif /* ERRCODE_H_ */
+
+/**************************** Copyright(C) pxf ****************************/

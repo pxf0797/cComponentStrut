@@ -1,9 +1,13 @@
-/*
- * func.h
- *
- *  Created on: 2018年8月21日
- *      Author: pxf
- */
+/**************************************************************************
+* @copyright    :Copyright(C), 2018, pxf, person.
+* @file         :func.h
+* @author       :pxf
+* @version      :v1.0
+* @date         :2018/08/31 20:52:28
+* @brief        :功能函数集合
+* @others       :
+* @history      :180831 pxf 初次建立
+***************************************************************************/
 
 #ifndef FUNC_H_
 #define FUNC_H_
@@ -18,5 +22,6 @@
 //     = (X(n)+((2^N)-1)Y(n-1))/(2^N)
 #define lowpassFilter(newValue, lastValue, n)  (((newValue) + (((lastValue) << (n)) - (lastValue))) >> (n))
 
-
 #endif /* FUNC_H_ */
+
+/**************************** Copyright(C) pxf ****************************/

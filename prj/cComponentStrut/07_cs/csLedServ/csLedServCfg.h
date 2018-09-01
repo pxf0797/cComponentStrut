@@ -3,10 +3,10 @@
 * @file         :csLedServCfg.h
 * @author       :pxf
 * @version      :v1.0
-* @date         :2018/08/31 23:21:10
+* @date         :2018/09/01 14:40:50
 * @brief        :组件csLedServ 配置头文件
 * @others       :
-* @history      :180831 pxf 初次建立
+* @history      :180901 pxf 初次建立
 ***************************************************************************/
 
 #ifndef CSLEDSERVCFG_H_
@@ -17,6 +17,6 @@
 #define CSLEDSERV_PRD_TICK_CFG        10000000.0L    // 任务调度周期配置(ns),10ms
 #define CSLEDSERV_START_TICK_CFG      3000000.0L     // 任务调度启动配置(ns),3ms
 
-#endif
+#endif /* CSLEDSERVCFG_H_ */
 
 /**************************** Copyright(C) pxf ****************************/

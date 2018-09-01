@@ -3,10 +3,10 @@
 * @file         :csLedServErrCode.h
 * @author       :pxf
 * @version      :v1.0
-* @date         :2018/08/31 23:21:10
+* @date         :2018/09/01 14:40:50
 * @brief        :组件csLedServ 内部各组成部分错误码定义头文件
 * @others       :
-* @history      :180831 pxf 初次建立
+* @history      :180901 pxf 初次建立
 ***************************************************************************/
 
 #ifndef CSLEDSERVERRCODE_H_
@@ -39,6 +39,6 @@
 #define csLedServ_part2_err1                           0        // EC_EC_cie       EC_ER_warning  // 组件部件1错误1
 /**********************************************************************************************************************/
 
-#endif
+#endif /* CSLEDSERVERRCODE_H_ */
 
 /**************************** Copyright(C) pxf ****************************/

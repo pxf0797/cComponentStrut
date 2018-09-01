@@ -49,6 +49,6 @@ extern isr mainLoop;
 ***********************************************/
 extern measure time;
 
-#endif
+#endif /* ABICASSCH_H_ */
 
 /**************************** Copyright(C) pxf ****************************/

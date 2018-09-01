@@ -104,10 +104,9 @@ extern vfbOcasSch vfbOcasSchA;
 #define SCH_TASK_GROUP_NUM  SCH_TASK_GROUP_NUM_CFG   // 调度任务组设置
 typedef void(*schTask)(void);                        // 通用调度任务类型
 
-/*任务管理组定义
+/*任务管理组声明
 ***********************************************/
-typedef struct
-{
+typedef struct{
     int16 taskGroupNum;
     uint16 tick;
     uint16 startTick[SCH_TASK_GROUP_NUM][32];     // 调度周期起始节拍
@@ -115,7 +114,7 @@ typedef struct
     uint32 actMask[SCH_TASK_GROUP_NUM];           // 激活请求任务掩码
     uint32 taskMask[SCH_TASK_GROUP_NUM];          // 已分配任务掩码
     schTask taskGroup[SCH_TASK_GROUP_NUM][32];    // 任务组
-} tasks;
+} taskGroups;
 
 /*组件状态机状态
 * 有两个状态init/default，状态list不显示，默认给出
@@ -125,12 +124,11 @@ typedef struct
     _(smcasSch, update)\
     _(smcasSch, execute)
 
-/*组件状态机定义
+/*组件状态机声明
 ***********************************************/
-SMDC(smcasSch, SM_CASSCH_STA_LIST)
-{
+SMDC(smcasSch, SM_CASSCH_STA_LIST){
     sta next;
-    tasks task;
+    taskGroups taskGroups;
 
     // 注入组件类
     void *casSch;
@@ -138,8 +136,7 @@ SMDC(smcasSch, SM_CASSCH_STA_LIST)
 
 /*组件调度调度参数（其他组件必含成员）
 ***********************************************/
-typedef struct
-{
+typedef struct{
     int16 id;                // 组件调度id，由组件初始化时分配
     void(*schTask)(void);    // 调度组件
     uint16 startTick;        // 调度周期起始节拍
@@ -163,6 +160,7 @@ CL(casSch){
     // 组件运行功能函数
     void (*run)(hcasSch t);
     void (*tick)(hcasSch t);
+    int16 (*delay)(hcasSch t, uint32 *tick);  // 节拍延时，最大支持32767个节拍，0延时已到，非0延时未到
 
     // 组件输入功能函数
     void (*addTask)(hcasSch t, int16 id, void(*schTask)(void), uint16 prdTick, uint16 startTick);
@@ -211,6 +209,6 @@ CL(vfbIcasSch){
 extern vfbIcasSch vfbIcasSchA;
 
 
-#endif
+#endif /* CASSCH_H_ */
 
 /**************************** Copyright(C) pxf ****************************/

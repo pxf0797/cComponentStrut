@@ -13,7 +13,7 @@
 
 /*组件调度id临时配置，组件实际使用时必须在vbfMCfg.h中配置
 ***********************************************************/
-#define casSch_id_priority_cfg   0
+//#define casSch_id_priority_cfg   0
 
 
 /***********************************************************
@@ -28,12 +28,8 @@ int16 vfbMcasSchInit(void){
 
     CN(vfbMcasSch, &vfbMcasSchA, &vfbOcasSchA, &vfbIcasSchA);
     if(OPRS(vfbMcasSchA) != OOPC_NULL){
-//        vfbMcasSchA.vfbOcasSch->schParam.id = casSch_id_priority_cfg;
-//        vfbMcasSchA.vfbOcasSch->schParam.prdTick = (CASSCH_PRD_TICK_CFG / CASSCH_TIMER_PRD_CFG);
-//        vfbMcasSchA.vfbOcasSch->schParam.startTick = (CASSCH_PRD_TICK_CFG / CASSCH_TIMER_PRD_CFG);
-//        vfbMcasSchA.vfbIcasSch->addTask(vfbMcasSchA.vfbIcasSch,
-//            vfbMcasSchA.vfbOcasSch->schParam.id, vfbMcasSchA.vfbOcasSch->schParam.schTask,
-//            vfbMcasSchA.vfbOcasSch->schParam.prdTick, vfbMcasSchA.vfbOcasSch->schParam.startTick);
+        //rtv |= vfbIcsLedServInit();
+        //TODO 对其他组件进行初始化
 
         rtv = 0;
     }else{

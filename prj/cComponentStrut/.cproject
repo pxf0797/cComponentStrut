@@ -57,7 +57,7 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry excluding="04_abi|08_cuf|05_cpnInit|01_casSch|09_cpc|02_bm|01_std|casX|10_ccc|06_cas|11_vfbM|02_casX|07_cs|03_bsp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
-						<entry excluding="template" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="01_std"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="01_std"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="02_bm"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="03_bsp"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="04_abi"/>
@@ -113,7 +113,7 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry excluding="04_abi|08_cuf|05_cpnInit|01_casSch|09_cpc|02_bm|01_std|casX|10_ccc|06_cas|11_vfbM|02_casX|07_cs|03_bsp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
-						<entry excluding="template" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="01_std"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="01_std"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="02_bm"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="03_bsp"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="04_abi"/>

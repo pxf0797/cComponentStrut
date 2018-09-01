@@ -3,10 +3,10 @@
 * @file         :vfbOcsLedServ.c
 * @author       :pxf
 * @version      :v1.0
-* @date         :2018/08/31 23:21:10
+* @date         :2018/09/01 14:40:50
 * @brief        :组件csLedServ 输出类定义
 * @others       :
-* @history      :180831 pxf 初次建立
+* @history      :180901 pxf 初次建立
 ***************************************************************************/
 
 #include "csLedServ.h"
