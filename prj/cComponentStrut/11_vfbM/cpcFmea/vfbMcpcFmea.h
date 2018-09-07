@@ -1,21 +1,20 @@
 /**************************************************************************
 * @copyright    :Copyright(C), 2018, pxf, person.
-* @file         :vfbMcsLedServ.h
+* @file         :vfbMcpcFmea.h
 * @author       :pxf
 * @version      :v1.0
-* @date         :2018/09/07 22:42:51
-* @brief        :组件csLedServ 管理类数据类型声明
+* @date         :2018/09/07 21:33:44
+* @brief        :组件cpcFmea 管理类数据类型声明
 * @others       :
 * @history      :180907 pxf 初次建立
 ***************************************************************************/
 
-#ifndef VFBMCSLEDSERV_H_
-#define VFBMCSLEDSERV_H_
+#ifndef VFBMCPCFMEA_H_
+#define VFBMCPCFMEA_H_
 
 #include "..\..\01_std\std.h"
 #include "..\..\06_cas\casSch\casSch.h"
 #include "..\..\09_cpc\cpcFmea\cpcFmea.h"
-#include "..\..\07_cs\csLedServ\csLedServ.h"
 #include "..\vfbMCfg.h"
 
 /***********************************************************
@@ -25,7 +24,7 @@
 * 输入: 无
 * 输出: int16 0-成功,-1-失败
 ***********************************************/
-int16 vfbMcsLedServInit(void);
+int16 vfbMcpcFmeaInit(void);
 
 
 /***********************************************************
@@ -33,35 +32,33 @@ int16 vfbMcsLedServInit(void);
 ***********************************************************/
 /*组件管理类声明
 ***********************************************/
-CL(vfbMcsLedServ){
-    hvfbMcsLedServ self;
-    hvfbMcsLedServ (*init)(hvfbMcsLedServ cthis, hvfbOcsLedServ vfbOcsLedServ,
-            hvfbIcasSch vfbIcasSch, hvfbIcpcFmea vfbIcpcFmea);
+CL(vfbMcpcFmea){
+    hvfbMcpcFmea self;
+    hvfbMcpcFmea (*init)(hvfbMcpcFmea cthis, hvfbOcpcFmea vfbOcpcFmea, hvfbIcasSch vfbIcasSch);
 
     // 组件管理参数
     //TODO
 
     // 组件管理功能函数
-    //void (*func)(hvfbMcsLedServ t);
+    //void (*func)(hvfbMcpcFmea t);
     //TODO
 
     // 注入组件输出类及其他功能类
-    INJ(vfbOcsLedServ, vfbOcsLedServ);
+    INJ(vfbOcpcFmea, vfbOcpcFmea);
     INJ(vfbIcasSch, vfbIcasSch);
-    INJ(vfbIcpcFmea, vfbIcpcFmea);
 };
 
 /*组件输出类接口声明
 * 命名方式: 存放类+实际类+实际类功能
 ***********************************************/
-void vfbMcsLedServ_vfbOcsLedServ_err(hvfbOcsLedServ t, herrCode code);
-//void vfbMcsLedServ_vfbOcsLedServ_output(hvfbOcsLedServ t);
+//void vfbMcpcFmea_vfbOcpcFmea_err(hvfbOcpcFmea t, herrCode code);
+//void vfbMcpcFmea_vfbOcpcFmea_output(hvfbOcpcFmea t);
 
 /*组件管理类实例
 ***********************************************/
-extern vfbMcsLedServ vfbMcsLedServA;
+extern vfbMcpcFmea vfbMcpcFmeaA;
 
 
-#endif /* VFBMCSLEDSERV_H_ */
+#endif /* VFBMCPCFMEA_H_ */
 
 /**************************** Copyright(C) pxf ****************************/

@@ -1,19 +1,19 @@
 /**************************************************************************
 * @copyright    :Copyright(C), 2018, pxf, person.
-* @file         :vfbMcsLedServ.c
+* @file         :vfbMcpcFmea.c
 * @author       :pxf
 * @version      :v1.0
-* @date         :2018/09/07 22:42:51
-* @brief        :组件csLedServ 管理类定义
+* @date         :2018/09/07 21:33:44
+* @brief        :组件cpcFmea 管理类定义
 * @others       :
 * @history      :180907 pxf 初次建立
 ***************************************************************************/
 
-#include "vfbMcsLedServ.h"
+#include "vfbMcpcFmea.h"
 
 /*组件调度id临时配置，组件实际使用时必须在vbfMCfg.h中配置
 ***********************************************************/
-#define csLedServ_id_priority_cfg   0
+//#define cpcFmea_id_priority_cfg   0
 
 
 /***********************************************************
@@ -23,17 +23,17 @@
 * 输入: 无
 * 输出: int16 0-成功,-1-失败
 ***********************************************/
-int16 vfbMcsLedServInit(void){
+int16 vfbMcpcFmeaInit(void){
     int16 rtv = 0;
 
-    CN(vfbMcsLedServ, &vfbMcsLedServA, &vfbOcsLedServA, &vfbIcasSchA, &vfbIcpcFmeaA);
-    if(OPRS(vfbMcsLedServA) != OOPC_NULL){
-        vfbMcsLedServA.vfbOcsLedServ->schParam.id = csLedServ_id_priority_cfg;
-        vfbMcsLedServA.vfbOcsLedServ->schParam.prdTick = (CSLEDSERV_PRD_TICK_CFG / CASSCH_TIMER_PRD_CFG);
-        vfbMcsLedServA.vfbOcsLedServ->schParam.startTick = (CSLEDSERV_PRD_TICK_CFG / CASSCH_TIMER_PRD_CFG);
-        vfbMcsLedServA.vfbIcasSch->addTask(vfbMcsLedServA.vfbIcasSch,
-            vfbMcsLedServA.vfbOcsLedServ->schParam.id, vfbMcsLedServA.vfbOcsLedServ->schParam.schTask,
-            vfbMcsLedServA.vfbOcsLedServ->schParam.prdTick, vfbMcsLedServA.vfbOcsLedServ->schParam.startTick);
+    CN(vfbMcpcFmea, &vfbMcpcFmeaA, &vfbOcpcFmeaA, &vfbIcasSchA);
+    if(OPRS(vfbMcpcFmeaA) != OOPC_NULL){
+        vfbMcpcFmeaA.vfbOcpcFmea->schParam.id = cpcFmea_id_priority_cfg;
+        vfbMcpcFmeaA.vfbOcpcFmea->schParam.prdTick = (CPCFMEA_PRD_TICK_CFG / CASSCH_TIMER_PRD_CFG);
+        vfbMcpcFmeaA.vfbOcpcFmea->schParam.startTick = (CPCFMEA_PRD_TICK_CFG / CASSCH_TIMER_PRD_CFG);
+        vfbMcpcFmeaA.vfbIcasSch->addTask(vfbMcpcFmeaA.vfbIcasSch,
+            vfbMcpcFmeaA.vfbOcpcFmea->schParam.id, vfbMcpcFmeaA.vfbOcpcFmea->schParam.schTask,
+            vfbMcpcFmeaA.vfbOcpcFmea->schParam.prdTick, vfbMcpcFmeaA.vfbOcpcFmea->schParam.startTick);
 
         rtv = 0;
     }else{
@@ -48,39 +48,37 @@ int16 vfbMcsLedServInit(void){
 * 组件管理定义
 ***********************************************************/
 /*组件管理类初始化函数
-* 输入: cthis vfbMcsLedServ类指针
-* 输出: hvfbMcsLedServ cthis/OOPC_NULL
+* 输入: cthis vfbMcpcFmea类指针
+* 输出: hvfbMcpcFmea cthis/OOPC_NULL
 ***********************************************/
-hvfbMcsLedServ vfbMcsLedServ_init(hvfbMcsLedServ cthis, hvfbOcsLedServ vfbOcsLedServ,
-            hvfbIcasSch vfbIcasSch, hvfbIcpcFmea vfbIcpcFmea){
+hvfbMcpcFmea vfbMcpcFmea_init(hvfbMcpcFmea cthis, hvfbOcpcFmea vfbOcpcFmea, hvfbIcasSch vfbIcasSch){
     // 功能函数配置
     //TODO
 
     // 参数配置
-    cthis->vfbOcsLedServ = vfbOcsLedServ;
+    cthis->vfbOcpcFmea = vfbOcpcFmea;
     cthis->vfbIcasSch = vfbIcasSch;
-    cthis->vfbIcpcFmea = vfbIcpcFmea;
     //TODO
 
     return cthis;
 }
 
 /*组件管理功能函数
-* 输入: t vfbMcsLedServ类指针
+* 输入: t vfbMcpcFmea类指针
 * 输出: 无
 ***********************************************/
-void vfbMcsLedServ_func(hvfbMcsLedServ t){
+void vfbMcpcFmea_func(hvfbMcpcFmea t){
     ;
 }
 
 /*组件管理类构造函数
-* 输入: cthis vfbMcsLedServ类指针
-* 输出: hvfbMcsLedServ cthis/OOPC_NULL
+* 输入: cthis vfbMcpcFmea类指针
+* 输出: hvfbMcpcFmea cthis/OOPC_NULL
 ***********************************************/
-CC(vfbMcsLedServ){
+CC(vfbMcpcFmea){
     // 功能函数配置
-    cthis->init = vfbMcsLedServ_init;
-    //cthis->func = vfbMcsLedServ_func;
+    cthis->init = vfbMcpcFmea_init;
+    //cthis->func = vfbMcpcFmea_func;
     //TODO
 
     // 参数配置
@@ -89,10 +87,10 @@ CC(vfbMcsLedServ){
     return cthis;
 }
 /*组件管理类析构函数
-* 输入: cthis vfbMcsLedServ类指针
+* 输入: cthis vfbMcpcFmea类指针
 * 输出: OOPC_RETURN_DATATYPE OOPC_TRUE/OOPC_FALSE
 ***********************************************/
-CD(vfbMcsLedServ){
+CD(vfbMcpcFmea){
     return OOPC_TRUE;
 }
 
@@ -102,13 +100,13 @@ CD(vfbMcsLedServ){
 ***********************************************************/
 /*组件输出类错误输出函数
 ***********************************************/
-void vfbMcsLedServ_vfbOcsLedServ_err(hvfbOcsLedServ t, herrCode code){
-    vfbMcsLedServA.vfbIcpcFmea->save(vfbMcsLedServA.vfbIcpcFmea, code);
-}
+//void vfbMcpcFmea_vfbOcpcFmea_err(hvfbOcpcFmea t, herrCode code){
+    //TODO
+//}
 
 /*组件输出类功能函数
 ***********************************************/
-//void vfbMcsLedServ_vfbOcsLedServ_output(hvfbOcsLedServ t){
+//void vfbMcpcFmea_vfbOcpcFmea_output(hvfbOcpcFmea t){
     //TODO
 //}
 
@@ -118,7 +116,7 @@ void vfbMcsLedServ_vfbOcsLedServ_err(hvfbOcsLedServ t, herrCode code){
 ***********************************************************/
 /*组件管理类实例
 ***********************************************/
-vfbMcsLedServ vfbMcsLedServA;
+vfbMcpcFmea vfbMcpcFmeaA;
 
 
 /**************************** Copyright(C) pxf ****************************/

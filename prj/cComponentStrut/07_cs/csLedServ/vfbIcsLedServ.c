@@ -3,10 +3,10 @@
 * @file         :vfbIcsLedServ.c
 * @author       :pxf
 * @version      :v1.0
-* @date         :2018/09/01 14:40:50
+* @date         :2018/09/07 22:42:51
 * @brief        :组件csLedServ 输入类定义
 * @others       :
-* @history      :180901 pxf 初次建立
+* @history      :180907 pxf 初次建立
 ***************************************************************************/
 
 #include "csLedServ.h"
@@ -40,7 +40,10 @@ int16 vfbIcsLedServInit(void){
 * 输出: hvfbIcsLedServ cthis/OOPC_NULL
 ***********************************************/
 hvfbIcsLedServ vfbIcsLedServ_init(hvfbIcsLedServ cthis, hcsLedServ csLedServ){
-    // 注入实例配置
+    // 功能函数配置
+    //TODO
+
+    // 参数配置
     cthis->csLedServ = csLedServ;
     //TODO
 
@@ -63,6 +66,9 @@ CC(vfbIcsLedServ){
     // 功能函数配置
     cthis->init = vfbIcsLedServ_init;
     //cthis->input = vfbIcsLedServ_input;
+    //TODO
+
+    // 参数配置
     //TODO
 
     return cthis;

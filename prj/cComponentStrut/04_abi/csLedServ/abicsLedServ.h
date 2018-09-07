@@ -3,10 +3,10 @@
 * @file         :abicsLedServ.h
 * @author       :pxf
 * @version      :v1.0
-* @date         :2018/09/01 14:40:50
+* @date         :2018/09/07 22:42:51
 * @brief        :组件csLedServ 抽象接口类型声明
 * @others       :
-* @history      :180901 pxf 初次建立
+* @history      :180907 pxf 初次建立
 ***************************************************************************/
 
 #ifndef ABICSLEDSERV_H_

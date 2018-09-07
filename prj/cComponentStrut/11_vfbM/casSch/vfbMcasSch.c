@@ -10,6 +10,8 @@
 ***************************************************************************/
 
 #include "vfbMcasSch.h"
+#include "..\..\07_cs\csLedServ\csLedServ.h"
+#include "..\..\09_cpc\cpcFmea\cpcFmea.h"
 
 /*组件调度id临时配置，组件实际使用时必须在vbfMCfg.h中配置
 ***********************************************************/
@@ -28,7 +30,8 @@ int16 vfbMcasSchInit(void){
 
     CN(vfbMcasSch, &vfbMcasSchA, &vfbOcasSchA, &vfbIcasSchA);
     if(OPRS(vfbMcasSchA) != OOPC_NULL){
-        //rtv |= vfbIcsLedServInit();
+        rtv |= vfbIcsLedServInit();
+        rtv |= vfbIcpcFmeaInit();
         //TODO 对其他组件进行初始化
 
         rtv = 0;

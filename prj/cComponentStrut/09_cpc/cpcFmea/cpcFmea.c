@@ -1,16 +1,15 @@
 /**************************************************************************
 * @copyright    :Copyright(C), 2018, pxf, person.
-* @file         :csLedServ.c
+* @file         :cpcFmea.c
 * @author       :pxf
 * @version      :v1.0
-* @date         :2018/09/07 22:42:51
-* @brief        :组件csLedServ 组件类定义
+* @date         :2018/09/07 21:33:44
+* @brief        :组件cpcFmea 组件类定义
 * @others       :
 * @history      :180907 pxf 初次建立
 ***************************************************************************/
 
-#include "csLedServ.h"
-#include "..\..\04_abi\csLedServ\abicsLedServ.h"
+#include "cpcFmea.h"
 
 /***********************************************************
 * 组件初始化
@@ -19,12 +18,13 @@
 * 输入: 无
 * 输出: int16 0-成功,-1-失败
 ***********************************************/
-int16 csLedServInit(void){
+int16 cpcFmeaInit(void){
     int16 rtv = 0;
 
-    CN(csLedServ, &csLedServA, &smcsLedServ[0], &vfbOcsLedServA);
-    if(OPRS(csLedServA) != OOPC_NULL){
-        rtv = vfbOcsLedServInit();
+    CN(cpcFmea, &cpcFmeaA, &smcpcFmea[0], &vfbOcpcFmeaA,
+            &cpcFmeaA.smcpcFmeaRec.code, sizeof(cpcFmeaA.smcpcFmeaRec.code), sizeof(errCode));
+    if(OPRS(cpcFmeaA) != OOPC_NULL){
+        rtv = vfbOcpcFmeaInit();
     }else{
         rtv = -1;
     }
@@ -40,8 +40,8 @@ int16 csLedServInit(void){
 * 输入: 无
 * 输出: 无
 ***********************************************/
-void csLedServSch(void){
-    csLedServA.run(csLedServA.self);
+void cpcFmeaSch(void){
+    cpcFmeaA.run(cpcFmeaA.self);
 }
 
 
@@ -55,55 +55,55 @@ void csLedServSch(void){
 ***********************************************************/
 /*组件状态机定义
 ***********************************************/
-SMDF(smcsLedServ, SM_CSLEDSERV_STA_LIST);
+SMDF(smcpcFmea, SM_CPCFMEA_STA_LIST);
 
-/*smcsLedServ_act_init
+/*smcpcFmea_act_init
 * 输入: hStaRec 状态记录结构体指针
 * 输出: 无
 ***********************************************/
-void smcsLedServ_act_init(void *hStaRec){
-    hsmcsLedServRec rec = (hsmcsLedServRec)hStaRec;
+void smcpcFmea_act_init(void *hStaRec){
+    hsmcpcFmeaRec rec = (hsmcpcFmeaRec)hStaRec;
 
-    rec->csLedServ = (void *)&csLedServA;
+    rec->cpcFmea = (void *)&cpcFmeaA;
     //TODO
 
-    rec->next = smcsLedServ_sta_default;
+    rec->next = smcpcFmea_sta_default;
 }
 
-/*smcsLedServ_act_sta1
+/*smcpcFmea_act_sta1
 * 输入: hStaRec 状态记录结构体指针
 * 输出: 无
 ***********************************************/
-void smcsLedServ_act_sta1(void *hStaRec){
-    hsmcsLedServRec rec = (hsmcsLedServRec)hStaRec;
-    //((hcsLedServ)(rec->csLedServ))->
+void smcpcFmea_act_sta1(void *hStaRec){
+    hsmcpcFmeaRec rec = (hsmcpcFmeaRec)hStaRec;
+    //((hcpcFmea)(rec->cpcFmea))->
     //TODO
 
-    rec->next = smcsLedServ_sta_default;
+    rec->next = smcpcFmea_sta_default;
 }
 
-/*smcsLedServ_act_sta2
+/*smcpcFmea_act_sta2
 * 输入: hStaRec 状态记录结构体指针
 * 输出: 无
 ***********************************************/
-void smcsLedServ_act_sta2(void *hStaRec){
-    hsmcsLedServRec rec = (hsmcsLedServRec)hStaRec;
-    //((hcsLedServ)(rec->csLedServ))->
+void smcpcFmea_act_sta2(void *hStaRec){
+    hsmcpcFmeaRec rec = (hsmcpcFmeaRec)hStaRec;
+    //((hcpcFmea)(rec->cpcFmea))->
     //TODO
 
-    rec->next = smcsLedServ_sta_default;
+    rec->next = smcpcFmea_sta_default;
 }
 
-/*smcsLedServ_act_default
+/*smcpcFmea_act_default
 * 输入: hStaRec 状态记录结构体指针
 * 输出: 无
 ***********************************************/
-void smcsLedServ_act_default(void *hStaRec){
-    hsmcsLedServRec rec = (hsmcsLedServRec)hStaRec;
-    //((hcsLedServ)(rec->csLedServ))->
+void smcpcFmea_act_default(void *hStaRec){
+    hsmcpcFmeaRec rec = (hsmcpcFmeaRec)hStaRec;
+    //((hcpcFmea)(rec->cpcFmea))->
     //TODO
 
-    rec->next = smcsLedServ_sta_default;
+    rec->next = smcpcFmea_sta_default;
 }
 
 
@@ -111,59 +111,73 @@ void smcsLedServ_act_default(void *hStaRec){
 * 组件定义
 ***********************************************************/
 /*组件类初始化函数
-* 输入: cthis csLedServ类指针
-* 输出: hcsLedServ cthis/OOPC_NULL
+* 输入: cthis cpcFmea类指针
+* 输出: hcpcFmea cthis/OOPC_NULL
 ***********************************************/
-hcsLedServ csLedServ_init(hcsLedServ cthis, hstaAct smcsLedServ, hvfbOcsLedServ vfbOcsLedServ){
+hcpcFmea cpcFmea_init(hcpcFmea cthis, hstaAct smcpcFmea, hvfbOcpcFmea vfbOcpcFmea,
+        void *listBuffer, int16 listBuffSize, int16 fifoObjSize){
     // 功能函数配置
+    CCC(fifo, &cthis->smcpcFmeaRec.errFifo, listBuffer, listBuffSize, fifoObjSize);
+    if(OPRS(*cthis->fifo) == OOPC_NULL){
+        return OOPC_NULL;
+    }
     //TODO
 
     // 参数配置
-    cthis->smcsLedServ = smcsLedServ;
-    cthis->vfbOcsLedServ = vfbOcsLedServ;
+    cthis->smcpcFmea = smcpcFmea;
+    cthis->vfbOcpcFmea = vfbOcpcFmea;
     //TODO
 
     return cthis;
 }
 
 /*组件运行函数
-* 输入: t csLedServ类指针
+* 输入: t cpcFmea类指针
 * 输出: 无
 ***********************************************/
-void csLedServ_run(hcsLedServ t){
-    SMRE(t->smcsLedServ, t->smcsLedServRec);
+void cpcFmea_run(hcpcFmea t){
+    SMRE(t->smcpcFmea, t->smcpcFmeaRec);
+}
+
+/*cpcFmea_save
+* 输入: t cpcFmea类指针
+* 输出: 无
+***********************************************/
+void cpcFmea_save(hcpcFmea t, herrCode code){
+    t->fifo->push(t->fifo, code);
 }
 
 /*组件错误输出函数
-* 输入: t csLedServ类指针
+* 输入: t cpcFmea类指针
 * 输出: 无
 ***********************************************/
-void csLedServ_err(hcsLedServ t, herrCode code){
-    t->vfbOcsLedServ->err(t->vfbOcsLedServ, code);
-}
+//void cpcFmea_err(hcpcFmea t, herrCode code){
+//    t->vfbOcpcFmea->err(t->vfbOcpcFmea, code);
+//}
 
 /*组件类构造函数
-* 输入: cthis csLedServ类指针
-* 输出: hcsLedServ cthis/OOPC_NULL
+* 输入: cthis cpcFmea类指针
+* 输出: hcpcFmea cthis/OOPC_NULL
 ***********************************************/
-CC(csLedServ){
+CC(cpcFmea){
     // 功能函数配置
-    cthis->init = csLedServ_init;
-    cthis->run = csLedServ_run;
-    cthis->err = csLedServ_err;
+    cthis->init = cpcFmea_init;
+    cthis->run = cpcFmea_run;
+    //cthis->err = cpcFmea_err;
     //TODO
 
     // 参数配置
-    cthis->smcsLedServRec.next = smcsLedServ_sta_init;
+    cthis->smcpcFmeaRec.next = smcpcFmea_sta_init;
+
     //TODO
 
     return cthis;
 }
 /*组件类析构函数
-* 输入: cthis csLedServ类指针
+* 输入: cthis cpcFmea类指针
 * 输出: OOPC_RETURN_DATATYPE OOPC_TRUE/OOPC_FALSE
 ***********************************************/
-CD(csLedServ){
+CD(cpcFmea){
     return OOPC_TRUE;
 }
 
@@ -173,7 +187,7 @@ CD(csLedServ){
 ***********************************************************/
 /*异步调度功能函数
 ***********************************************/
-//void csLedServ_abi_example(void){
+//void cpcFmea_abi_example(void){
     //TODO
 //}
 
@@ -183,7 +197,7 @@ CD(csLedServ){
 ***********************************************************/
 /*组件类实例
 ***********************************************/
-csLedServ csLedServA;
+cpcFmea cpcFmeaA;
 
 
 /**************************** Copyright(C) pxf ****************************/

@@ -1,21 +1,22 @@
 /**************************************************************************
 * @copyright    :Copyright(C), 2018, pxf, person.
-* @file         :csLedServ.h
+* @file         :cpcFmea.h
 * @author       :pxf
 * @version      :v1.0
-* @date         :2018/09/07 22:42:51
-* @brief        :组件csLedServ 输入类、组件类、输出类数据类型声明头文件
+* @date         :2018/09/07 21:33:44
+* @brief        :组件cpcFmea 输入类、组件类、输出类数据类型声明头文件
 * @others       :
 * @history      :180907 pxf 初次建立
 ***************************************************************************/
 
-#ifndef CSLEDSERV_H_
-#define CSLEDSERV_H_
+#ifndef CPCFMEA_H_
+#define CPCFMEA_H_
 
 #include "..\..\01_std\std.h"
+#include "..\..\02_bm\fifo\fifo.h"
 #include "..\..\06_cas\casSch\casSch.h"
-#include "csLedServCfg.h"
-#include "csLedServErrCode.h"
+#include "cpcFmeaCfg.h"
+#include "cpcFmeaErrCode.h"
 
 /***********************************************************
 * 组件初始化
@@ -24,25 +25,25 @@
 * 输入: 无
 * 输出: int16 0-成功,-1-失败
 ***********************************************/
-int16 vfbIcsLedServInit(void);
+int16 vfbIcpcFmeaInit(void);
 
 /*组件初始化
 * 输入: 无
 * 输出: int16 0-成功,-1-失败
 ***********************************************/
-int16 csLedServInit(void);
+int16 cpcFmeaInit(void);
 
 /*组件输出初始化
 * 输入: 无
 * 输出: int16 0-成功,-1-失败
 ***********************************************/
-int16 vfbOcsLedServInit(void);
+int16 vfbOcpcFmeaInit(void);
 
 /*管理组件初始化外部声明
 * 输入: 无
 * 输出: int16 0-成功,-1-失败
 ***********************************************/
-extern int16 vfbMcsLedServInit(void);
+extern int16 vfbMcpcFmeaInit(void);
 
 
 /***********************************************************
@@ -52,7 +53,7 @@ extern int16 vfbMcsLedServInit(void);
 * 输入: 无
 * 输出: 无
 ***********************************************/
-void csLedServSch(void);
+void cpcFmeaSch(void);
 
 
 /***********************************************************
@@ -70,16 +71,16 @@ void csLedServSch(void);
 ***********************************************************/
 /*组件输出类声明
 ***********************************************/
-CL(vfbOcsLedServ){
-    hvfbOcsLedServ self;
-    hvfbOcsLedServ (*init)(hvfbOcsLedServ cthis, void (*err)(hvfbOcsLedServ t, herrCode code));
+CL(vfbOcpcFmea){
+    hvfbOcpcFmea self;
+    hvfbOcpcFmea (*init)(hvfbOcpcFmea cthis);
 
     // 组件输出类参数
     schParam schParam;    // 组件调度参数
     //TODO
 
     // 组件输出类功能函数
-    void (*err)(hvfbOcsLedServ t, herrCode code);
+    //void (*err)(hvfbOcpcFmea t, herrCode code);
     //void (*output)(hvfbO%s t);
     //TODO
 };
@@ -87,13 +88,13 @@ CL(vfbOcsLedServ){
 /*组件输出类外部接口声明
 * 命名方式: 存放类+实际类+实际类功能
 ***********************************************/
-extern void vfbMcsLedServ_vfbOcsLedServ_err(hvfbOcsLedServ t, herrCode code);
-//extern void vfbMcsLedServ_vfbOcsLedServ_output(hvfbOcsLedServ t);
+//extern void vfbMcpcFmea_vfbOcpcFmea_err(hvfbOcpcFmea t, herrCode code);
+//extern void vfbMcpcFmea_vfbOcpcFmea_output(hvfbOcpcFmea t);
 //TODO
 
 /*组件输出类实例
 ***********************************************/
-extern vfbOcsLedServ vfbOcsLedServA;
+extern vfbOcpcFmea vfbOcpcFmeaA;
 
 
 /***********************************************************
@@ -103,62 +104,66 @@ extern vfbOcsLedServ vfbOcsLedServA;
 * 有两个状态init/default，状态list不显示，默认给出
 * 状态list需根据实际应用进行重写，list修改后相应状态函数得对应修改
 ***********************************************/
-#define SM_CSLEDSERV_STA_LIST(_) \
-    _(smcsLedServ, sta1)\
-    _(smcsLedServ, sta2)
+#define SM_CPCFMEA_STA_LIST(_) \
+    _(smcpcFmea, sta1)\
+    _(smcpcFmea, sta2)
 
 /*组件状态机声明
 ***********************************************/
-SMDC(smcsLedServ, SM_CSLEDSERV_STA_LIST){
+SMDC(smcpcFmea, SM_CPCFMEA_STA_LIST){
     sta next;
+    errCode code[CPCFMEA_ERRCODE_FIFO_LEN_CFG];
+    fifo errFifo;
     //TODO
 
     // 注入组件类
-    void *csLedServ;
+    void *cpcFmea;
 };
 
 
 /*组件类声明
 ***********************************************/
-CL(csLedServ){
-    hcsLedServ self;
-    hcsLedServ (*init)(hcsLedServ cthis, hstaAct smcsLedServ, hvfbOcsLedServ vfbOcsLedServ);
+CL(cpcFmea){
+    hcpcFmea self;
+    hcpcFmea (*init)(hcpcFmea cthis, hstaAct smcpcFmea, hvfbOcpcFmea vfbOcpcFmea,
+            void *listBuffer, int16 listBuffSize, int16 fifoObjSize);
 
     // 组件运行状态机
-    smcsLedServRec smcsLedServRec;
-    hstaAct smcsLedServ;
+    smcpcFmeaRec smcpcFmeaRec;
+    hstaAct smcpcFmea;
 
     // 组件运行相关参数
     //TODO
 
     // 组件运行功能函数
-    void (*run)(hcsLedServ t);
-    //void (*example)(hcsLedServ t);
+    void (*run)(hcpcFmea t);
+    //void (*example)(hcpcFmea t);
     //TODO
 
     // 组件输入功能函数
-    //void (*input)(hcsLedServ t);
+    void (*save)(hcpcFmea t, herrCode code);
     //TODO
 
     // 组件输出功能函数
-    void (*err)(hcsLedServ t, herrCode code);
-    //void (*output)(hcsLedServ t);
+    //void (*err)(hcpcFmea t, herrCode code);
+    //void (*output)(hcpcFmea t);
     //TODO
 
     // 注入组件输出类及其他功能类
-    INJ(vfbOcsLedServ, vfbOcsLedServ);
+    INJ(vfbOcpcFmea, vfbOcpcFmea);
+    EXT(fifo);
 };
 
 /*异步调度功能函数
 * 命名方式: 存放类+实际类+实际类功能
 * 只有cas类型组件才有此函数
 ***********************************************/
-//void csLedServ_abi_example(void);
+//void cpcFmea_abi_example(void);
 //TODO
 
 /*组件类实例
 ***********************************************/
-extern csLedServ csLedServA;
+extern cpcFmea cpcFmeaA;
 
 
 /***********************************************************
@@ -166,23 +171,23 @@ extern csLedServ csLedServA;
 ***********************************************************/
 /*组件输入类声明
 ***********************************************/
-CL(vfbIcsLedServ){
-    hvfbIcsLedServ self;
-    hvfbIcsLedServ (*init)(hvfbIcsLedServ cthis, hcsLedServ csLedServ);
+CL(vfbIcpcFmea){
+    hvfbIcpcFmea self;
+    hvfbIcpcFmea (*init)(hvfbIcpcFmea cthis, hcpcFmea cpcFmea);
 
     // 组件输入类功能函数
-    //void (*input)(hvfbIcsLedServ t);
+    void (*save)(hvfbIcpcFmea t, herrCode code);
     //TODO
 
     // 注入组件类
-    INJ(csLedServ, csLedServ);
+    INJ(cpcFmea, cpcFmea);
 };
 
 /*组件输入类实例
 ***********************************************/
-extern vfbIcsLedServ vfbIcsLedServA;
+extern vfbIcpcFmea vfbIcpcFmeaA;
 
 
-#endif /* CSLEDSERV_H_ */
+#endif /* CPCFMEA_H_ */
 
 /**************************** Copyright(C) pxf ****************************/

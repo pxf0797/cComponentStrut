@@ -140,7 +140,7 @@ typedef struct{
     int16 id;                // 组件调度id，由组件初始化时分配
     void(*schTask)(void);    // 调度组件
     uint16 startTick;        // 调度周期起始节拍
-    uint16 prdTick;          // 周期调度节拍
+    uint16 prdTick;          // 调度周期节拍
 } schParam;
 
 /*组件类声明
